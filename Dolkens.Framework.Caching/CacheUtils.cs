@@ -151,7 +151,7 @@ namespace Dolkens.Framework.Caching
                 {
                     CacheUtils._lockTable[cacheKey] = CacheUtils._lockTable[cacheKey] ?? new Object();
 
-                    inLock = Monitor.TryEnter(CacheUtils._lockTable[cacheKey], ConfigurationManager.AppSettings["Dolkens.Framework.Caching.LockTimeout"].ToInt32(500));
+                    inLock = Monitor.TryEnter(CacheUtils._lockTable[cacheKey], settings.LockTimeout);
                 }
 
                 buffer = CacheUtils.Cache.Get(cacheKey);

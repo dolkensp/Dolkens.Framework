@@ -43,5 +43,12 @@ namespace Dolkens.Framework.Caching.Memory
 
             return policy;
         }
+
+        private Int32? _lockTimeout;
+        public Int32 LockTimeout
+        {
+            get { return (this._lockTimeout = this._lockTimeout ?? ConfigurationManager.AppSettings["Dolkens.Framework.Caching.LockTimeout"].ToInt32()) ?? 500; }
+            set { this._lockTimeout = value; }
+        }
     }
 }
