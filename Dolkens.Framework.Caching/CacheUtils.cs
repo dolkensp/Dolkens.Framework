@@ -146,13 +146,19 @@ namespace Dolkens.Framework.Caching
 
             if (buffer == null && ConfigurationManager.AppSettings["Dolkens.Framework.Caching.Lock"].ToBoolean(true))
             {
-                // Only process a single thread for a particular cacheKey at a time
-                lock (CacheUtils._lockTable)
+                if (CacheUtils._lockTable[cacheKey] == null)
                 {
-                    CacheUtils._lockTable[cacheKey] = CacheUtils._lockTable[cacheKey] ?? new Object();
-
-                    inLock = Monitor.TryEnter(CacheUtils._lockTable[cacheKey], settings.LockTimeout);
+                    // Only process a single thread for a particular cacheKey at a time
+                    lock (CacheUtils._lockTable)
+                    {
+                        if (CacheUtils._lockTable[cacheKey] == null)
+                        {
+                            CacheUtils._lockTable[cacheKey] = CacheUtils._lockTable[cacheKey] ?? new Object();
+                        }
+                    }
                 }
+
+                inLock = Monitor.TryEnter(CacheUtils._lockTable[cacheKey], settings.LockTimeout);
 
                 buffer = CacheUtils.Cache.Get(cacheKey);
 

@@ -36,8 +36,11 @@ namespace Dolkens.Framework.Caching.Memory
                 // TODO: Add Callback Support
             };
 
-            if (this.Dependencies.CacheKeys != null && this.Dependencies.CacheKeys.Count() > 0)
-                policy.ChangeMonitors.Add(ASP.MemoryCache.Default.CreateCacheEntryChangeMonitor(this.Dependencies.CacheKeys));
+            // TODO: Add dependency tracking
+            // if (this.Dependencies.CacheKeys != null && this.Dependencies.CacheKeys.Count() > 0)
+            // {
+            //     policy.ChangeMonitors.Add(ASP.MemoryCache.Default.CreateCacheEntryChangeMonitor(this.Dependencies.CacheKeys.Distinct()));
+            // }
 
             // TODO: Add more Support for more ChangeMonitors (Files + SQL)
 
