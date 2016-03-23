@@ -801,7 +801,7 @@ namespace Dolkens.Framework.Extensions
         {
             Type type = typeof(TResult);
 
-            return (TResult)DDRIT.Parse(input, type, default(TResult));
+            return (TResult)DDRIT.Parse(input, type, @default);
         }
 
         public static Boolean ToBoolean(this String input, Boolean @default)
