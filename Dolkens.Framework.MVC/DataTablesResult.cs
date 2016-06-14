@@ -57,7 +57,7 @@ namespace Dolkens.Framework.MVC
 
             if (this.Data == null) return;
 
-            RowType[] data;
+            RowType[] data = null;
             var query = this.Data.AsEnumerable();
 
             Int32 cCount = context.RequestContext.HttpContext.Request["iColumns"].ToInt32(0);
@@ -115,10 +115,11 @@ namespace Dolkens.Framework.MVC
 
             if (sCount > 0)
             {
-                var sQuery = query.OrderBy(r => true);
+                IOrderedEnumerable<RowType> sQuery = null;
 
+                Int32 sorts = 0;
                 Int32 sortColumn;
-                Int32 sortDirection;
+                String sortDirection;
 
                 for (Int32 cIndex = 0; cIndex < sCount; cIndex++)
                 {
@@ -126,23 +127,41 @@ namespace Dolkens.Framework.MVC
                     {
                         if (propertyMap.ContainsKey(sortColumn))
                         {
-                            sortDirection = context.RequestContext.HttpContext.Request[String.Format("sSortDir_{0}", cIndex)].ToInt32(0);
+                            sortDirection = context.RequestContext.HttpContext.Request[String.Format("sSortDir_{0}", cIndex)];
 
-                            if (sortDirection == 0)
+                            if (sorts++ == 0)
                             {
-                                sQuery = sQuery.ThenBy(r => propertyMap[sortColumn].GetValue(r));
+                                if (sortDirection == "desc")
+                                {
+                                    sQuery = query.OrderByDescending(r => propertyMap[sortColumn].GetValue(r));
+                                }
+                                else
+                                {
+                                    sQuery = query.OrderBy(r => propertyMap[sortColumn].GetValue(r));
+                                }
                             }
                             else
                             {
-                                sQuery = sQuery.ThenByDescending(r => propertyMap[sortColumn].GetValue(r));
+                                if (sortDirection == "desc")
+                                {
+                                    sQuery = sQuery.ThenByDescending(r => propertyMap[sortColumn].GetValue(r));
+                                }
+                                else
+                                {
+                                    sQuery = sQuery.ThenBy(r => propertyMap[sortColumn].GetValue(r));
+                                }
                             }
                         }
                     }
                 }
 
-                data = sQuery.ToArray();
+                if (sQuery != null)
+                {
+                    data = sQuery.ToArray();
+                }
             }
-            else
+
+            if (data == null)
             {
                 data = query.ToArray();
             }
