@@ -13,7 +13,7 @@ using System.Web.Mvc;
 namespace Dolkens.Framework.MVC
 {
 
-    public class DataTablesResult<RowType> : ActionResult
+    public class DataTablesResult<RowType> : JsonNetResult
     {
         const String JsonRequest_GetNotAllowed = "This request has been blocked because sensitive information could be disclosed to third party web sites when this is used in a GET request. To allow GET requests, set JsonRequestBehavior to AllowGet.";
 
@@ -23,13 +23,11 @@ namespace Dolkens.Framework.MVC
             this.JsonRequestBehavior = JsonRequestBehavior.DenyGet;
         }
 
-        public Encoding ContentEncoding { get; set; }
-
-        public String ContentType { get; set; }
-
-        public IEnumerable<RowType> Data { get; set; }
-
-        public JsonRequestBehavior JsonRequestBehavior { get; set; }
+        public new IEnumerable<RowType> Data
+        {
+            get { return (IEnumerable<RowType>)base.Data; }
+            set { base.Data = value; }
+        }
 
         private static Dictionary<Type, Dictionary<String, PropertyInfo>> _jsonMaps = new Dictionary<Type, Dictionary<String, PropertyInfo>> { };
 
