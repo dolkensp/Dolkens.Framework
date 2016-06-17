@@ -93,7 +93,16 @@ namespace Dolkens.Framework.MVC
                             {
                                 if (!columnRegex)
                                 {
-                                    query = query.Where(r => jsonMap[columnName].GetValue(r).ToString().ToLowerInvariant().Contains(columnSearch.ToLowerInvariant()));
+                                    if (jsonMap[columnName].PropertyType == typeof(String))
+                                    {
+                                        query = query.Where(r => jsonMap[columnName].GetValue(r).ToString().ToLowerInvariant().Contains(columnSearch.ToLowerInvariant()));
+                                    }
+                                    else
+                                    {
+                                        Object searchValue = columnSearch.Parse(jsonMap[columnName].PropertyType);
+                                        query = query.Where(r => jsonMap[columnName].GetValue(r).Equals(searchValue));
+                                        // .ToString().Equals(columnSearch, StringComparison.InvariantCultureIgnoreCase));
+                                    }
                                 }
                                 else
                                 {
