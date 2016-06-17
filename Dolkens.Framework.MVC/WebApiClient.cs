@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
+using System.Net.Http.Formatting;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -18,6 +19,15 @@ namespace Dolkens.Framework.MVC
 
     public class WebApiClient : IDisposable
     {
+        public enum MediaTypeFormatterEnum
+        {
+            Bson,
+            Json,
+            FormUrlEncoded,
+            WwwFormUrlEncoded,
+            Xml
+        }
+
         #region Private Properties
 
         protected HttpClient _client;
@@ -75,20 +85,20 @@ namespace Dolkens.Framework.MVC
 
         #region CRUD Methods
 
-        public virtual TResponse Create<TResponse>(IWebApiRequest<TResponse> data = null) { return this.Create<TResponse>(data.ResourceUrl, data); }
+        public virtual TResponse Create<TResponse>(IWebApiRequest<TResponse> data = null, MediaTypeFormatterEnum mediaTypeFormatter = MediaTypeFormatterEnum.Json) { return this.Create<TResponse>(data.ResourceUrl, data, mediaTypeFormatter); }
 
-        public virtual TResponse Create<TResponse>(String resource, Object data = null)
+        public virtual TResponse Create<TResponse>(String resource, Object data = null, MediaTypeFormatterEnum mediaTypeFormatter = MediaTypeFormatterEnum.Json)
         {
             HttpContent content = data == null ?
-                new ObjectContent(typeof(Object), data, new WwwFormUrlEncodedMediaTypeFormatter { }) :
-                new ObjectContent(data.GetType(), data, new WwwFormUrlEncodedMediaTypeFormatter { });
+                new ObjectContent(typeof(Object), data, this.GetMediaTypeFormatter(mediaTypeFormatter)) :
+                new ObjectContent(data.GetType(), data, this.GetMediaTypeFormatter(mediaTypeFormatter));
 
             return this._client.PostAsync(resource, content).Result.Content.ReadAsAsync<TResponse>().Result;
         }
 
-        public virtual TResponse Retrieve<TResponse>(IWebApiRequest<TResponse> data = null) { return this.Retrieve<TResponse>(data.ResourceUrl, data); }
+        public virtual TResponse Retrieve<TResponse>(IWebApiRequest<TResponse> data = null, MediaTypeFormatterEnum mediaTypeFormatter = MediaTypeFormatterEnum.Json) { return this.Retrieve<TResponse>(data.ResourceUrl, data, mediaTypeFormatter); }
 
-        public virtual TResponse Retrieve<TResponse>(String resource, Object data = null)
+        public virtual TResponse Retrieve<TResponse>(String resource, Object data = null, MediaTypeFormatterEnum mediaTypeFormatter = MediaTypeFormatterEnum.Json)
         {
             var query = WwwFormUrlEncodedMediaTypeFormatter.Serialize(data);
 
@@ -107,20 +117,20 @@ namespace Dolkens.Framework.MVC
             return this._client.GetAsync(resource).Result.Content.ReadAsAsync<TResponse>().Result;
         }
 
-        public virtual TResponse Update<TResponse>(IWebApiRequest<TResponse> data = null) { return this.Update<TResponse>(data.ResourceUrl, data); }
+        public virtual TResponse Update<TResponse>(IWebApiRequest<TResponse> data = null, MediaTypeFormatterEnum mediaTypeFormatter = MediaTypeFormatterEnum.Json) { return this.Update<TResponse>(data.ResourceUrl, data, mediaTypeFormatter); }
 
-        public virtual TResponse Update<TResponse>(String resource, Object data = null)
+        public virtual TResponse Update<TResponse>(String resource, Object data = null, MediaTypeFormatterEnum mediaTypeFormatter = MediaTypeFormatterEnum.Json)
         {
             HttpContent content = data == null ?
-                new ObjectContent(typeof(Object), data, new WwwFormUrlEncodedMediaTypeFormatter { }) :
-                new ObjectContent(data.GetType(), data, new WwwFormUrlEncodedMediaTypeFormatter { });
+                new ObjectContent(typeof(Object), data, this.GetMediaTypeFormatter(mediaTypeFormatter)) :
+                new ObjectContent(data.GetType(), data, this.GetMediaTypeFormatter(mediaTypeFormatter));
 
             return this._client.PutAsync(resource, content).Result.Content.ReadAsAsync<TResponse>().Result;
         }
 
-        public virtual TResponse Delete<TResponse>(IWebApiRequest<TResponse> data = null) { return this.Delete<TResponse>(data.ResourceUrl, data); }
+        public virtual TResponse Delete<TResponse>(IWebApiRequest<TResponse> data = null, MediaTypeFormatterEnum mediaTypeFormatter = MediaTypeFormatterEnum.Json) { return this.Delete<TResponse>(data.ResourceUrl, data, mediaTypeFormatter); }
 
-        public virtual TResponse Delete<TResponse>(String resource, Object data = null)
+        public virtual TResponse Delete<TResponse>(String resource, Object data = null, MediaTypeFormatterEnum mediaTypeFormatter = MediaTypeFormatterEnum.Json)
         {
             var query = WwwFormUrlEncodedMediaTypeFormatter.Serialize(data);
 
@@ -145,6 +155,25 @@ namespace Dolkens.Framework.MVC
         {
             this._client = this._client ?? new HttpClient { };
             this._client.Dispose();
+        }
+
+        private MediaTypeFormatter GetMediaTypeFormatter(MediaTypeFormatterEnum mediaTypeFormatter)
+        {
+            switch (mediaTypeFormatter)
+            {
+                case MediaTypeFormatterEnum.Bson:
+                    return new BsonMediaTypeFormatter { };
+                case MediaTypeFormatterEnum.FormUrlEncoded:
+                    return new FormUrlEncodedMediaTypeFormatter { };
+                case MediaTypeFormatterEnum.Json:
+                    return new JsonMediaTypeFormatter { };
+                case MediaTypeFormatterEnum.WwwFormUrlEncoded:
+                    return new WwwFormUrlEncodedMediaTypeFormatter { };
+                case MediaTypeFormatterEnum.Xml:
+                    return new XmlMediaTypeFormatter { };
+            }
+
+            throw new ArgumentException("Invalid MediaTypeFormatter specified", "mediaTypeFormatter");
         }
     }
 }
