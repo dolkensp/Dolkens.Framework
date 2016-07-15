@@ -12,53 +12,18 @@ using System.Web.Mvc;
 
 namespace Dolkens.Framework.MVC
 {
-
-    public class DataTablesResult<RowType> : JsonNetResult
+    public static class DataTablesResult
     {
-        const String JsonRequest_GetNotAllowed = "This request has been blocked because sensitive information could be disclosed to third party web sites when this is used in a GET request. To allow GET requests, set JsonRequestBehavior to AllowGet.";
-
-        public DataTablesResult()
-            : base()
-        {
-            this.JsonRequestBehavior = JsonRequestBehavior.DenyGet;
-        }
-
-        public new IEnumerable<RowType> Data
-        {
-            get { return (IEnumerable<RowType>)base.Data; }
-            set { base.Data = value; }
-        }
-
         private static Dictionary<Type, Dictionary<String, PropertyInfo>> _jsonMaps = new Dictionary<Type, Dictionary<String, PropertyInfo>> { };
 
-        public override void ExecuteResult(ControllerContext context)
+        public static IEnumerable<RowType> Filter<RowType>(IEnumerable<RowType> input)
         {
-            if (context == null)
-                throw new ArgumentNullException("context");
-
-            if (this.JsonRequestBehavior == JsonRequestBehavior.DenyGet &&
-                String.Equals(context.HttpContext.Request.HttpMethod, "GET", StringComparison.OrdinalIgnoreCase))
-                throw new InvalidOperationException(DataTablesResult<RowType>.JsonRequest_GetNotAllowed);
-
-            HttpResponseBase response = context.HttpContext.Response;
-
-            if (!String.IsNullOrEmpty(this.ContentType))
-                response.ContentType = this.ContentType;
-            else
-                response.ContentType = "application/json";
-
-            if (this.ContentEncoding != null)
-                response.ContentEncoding = ContentEncoding;
-
-            Int32 displayStart = context.RequestContext.HttpContext.Request["iDisplayStart"].ToInt32(0);
-            Int32 displayLength = context.RequestContext.HttpContext.Request["iDisplayLength"].ToInt32(100);
-
-            if (this.Data == null) return;
+            var request = HttpContext.Current.Request;
 
             RowType[] data = null;
-            var query = this.Data.AsEnumerable();
+            var query = input.AsEnumerable();
 
-            Int32 cCount = context.RequestContext.HttpContext.Request["iColumns"].ToInt32(0);
+            Int32 cCount = request["iColumns"].ToInt32(0);
             Dictionary<Int32, PropertyInfo> propertyMap = new Dictionary<Int32, PropertyInfo> { };
 
             #region Search Support
@@ -79,9 +44,9 @@ namespace Dolkens.Framework.MVC
 
                 for (Int32 cIndex = 0; cIndex < cCount; cIndex++)
                 {
-                    var columnName = context.RequestContext.HttpContext.Request[String.Format("mDataProp_{0}", cIndex)];
-                    var columnSearch = context.RequestContext.HttpContext.Request[String.Format("sSearch_{0}", cIndex)];
-                    var columnRegex = context.RequestContext.HttpContext.Request[String.Format("bRegex_{0}", cIndex)].ToBoolean(false);
+                    var columnName = request[String.Format("mDataProp_{0}", cIndex)];
+                    var columnSearch = request[String.Format("sSearch_{0}", cIndex)];
+                    var columnRegex = request[String.Format("bRegex_{0}", cIndex)].ToBoolean(false);
 
                     if (!String.IsNullOrWhiteSpace(columnName))
                     {
@@ -118,7 +83,7 @@ namespace Dolkens.Framework.MVC
 
             #region Sorting Support
 
-            Int32 sCount = context.RequestContext.HttpContext.Request["iSortingCols"].ToInt32(0);
+            Int32 sCount = request["iSortingCols"].ToInt32(0);
 
             if (sCount > 0)
             {
@@ -130,11 +95,11 @@ namespace Dolkens.Framework.MVC
 
                 for (Int32 cIndex = 0; cIndex < sCount; cIndex++)
                 {
-                    if (Int32.TryParse(context.RequestContext.HttpContext.Request[String.Format("iSortCol_{0}", cIndex)], out sortColumn))
+                    if (Int32.TryParse(request[String.Format("iSortCol_{0}", cIndex)], out sortColumn))
                     {
                         if (propertyMap.ContainsKey(sortColumn))
                         {
-                            sortDirection = context.RequestContext.HttpContext.Request[String.Format("sSortDir_{0}", cIndex)];
+                            sortDirection = request[String.Format("sSortDir_{0}", cIndex)];
 
                             if (sorts++ == 0)
                             {
@@ -175,9 +140,56 @@ namespace Dolkens.Framework.MVC
 
             #endregion
 
+            return data;
+        }
+    }
+
+    public class DataTablesResult<RowType> : JsonNetResult
+    {
+        const String JsonRequest_GetNotAllowed = "This request has been blocked because sensitive information could be disclosed to third party web sites when this is used in a GET request. To allow GET requests, set JsonRequestBehavior to AllowGet.";
+
+        public DataTablesResult()
+            : base()
+        {
+            this.JsonRequestBehavior = JsonRequestBehavior.DenyGet;
+        }
+
+        public new IEnumerable<RowType> Data
+        {
+            get { return (IEnumerable<RowType>)base.Data; }
+            set { base.Data = value; }
+        }
+
+        public override void ExecuteResult(ControllerContext context)
+        {
+            if (context == null)
+                throw new ArgumentNullException("context");
+
+            if (this.JsonRequestBehavior == JsonRequestBehavior.DenyGet &&
+                String.Equals(context.HttpContext.Request.HttpMethod, "GET", StringComparison.OrdinalIgnoreCase))
+                throw new InvalidOperationException(DataTablesResult<RowType>.JsonRequest_GetNotAllowed);
+
+            HttpRequestBase request = context.HttpContext.Request;
+            HttpResponseBase response = context.HttpContext.Response;
+
+            if (!String.IsNullOrEmpty(this.ContentType))
+                response.ContentType = this.ContentType;
+            else
+                response.ContentType = "application/json";
+
+            if (this.ContentEncoding != null)
+                response.ContentEncoding = ContentEncoding;
+
+            if (this.Data == null) return;
+
+            Int32 displayStart = request["iDisplayStart"].ToInt32(0);
+            Int32 displayLength = request["iDisplayLength"].ToInt32(100);
+
+            var data = DataTablesResult.Filter<RowType>(this.Data);
+
             response.Write(new
             {
-                sEcho = context.RequestContext.HttpContext.Request["sEcho"],
+                sEcho = request["sEcho"],
                 recordsTotal = this.Data.Count(),
                 recordsFiltered = data.Count(),
                 data = data.Skip(displayStart).Take(displayLength),
