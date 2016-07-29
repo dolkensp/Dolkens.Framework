@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -9,12 +10,84 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
+using ExtensionMethods = Dolkens.Framework.Extensions.ExtensionMethods;
 
 namespace Dolkens.Framework.MVC
 {
     public static class DataTablesResult
     {
         private static Dictionary<Type, Dictionary<String, PropertyInfo>> _jsonMaps = new Dictionary<Type, Dictionary<String, PropertyInfo>> { };
+
+        private static Boolean AnyItem(this Object data, Type dataType, String searchTerm)
+        {
+            if (data == null)
+            {
+                return false;
+            }
+            else if (typeof(String) == dataType)
+            {
+                return ((String)data).ToLowerInvariant().Contains(searchTerm.ToLowerInvariant());
+            }
+            else if (typeof(IEnumerable).IsAssignableFrom(dataType))
+            {
+                foreach (var item in (IEnumerable)data)
+                {
+                    if (item.AnyItem(item.GetType(), searchTerm))
+                        return true;
+                }
+                
+                return false;
+            }
+            else
+            {
+                Object searchValue = searchTerm.Parse(dataType);
+                return data.Equals(searchValue);
+            }
+        }
+
+        private static Boolean AnyItem(this Object data, Type dataType, Regex searchTerm)
+        {
+            if (data == null)
+            {
+                return false;
+            }
+            else if (typeof(String) == dataType)
+            {
+                return searchTerm.IsMatch((String)data);
+            }
+            else if (typeof(IEnumerable).IsAssignableFrom(dataType))
+            {
+                foreach (var item in (IEnumerable)data)
+                {
+                    if (data.AnyItem(item.GetType(), searchTerm))
+                        return true;
+                }
+
+                return false;
+            }
+            else
+            {
+                return searchTerm.IsMatch(data.ToString());
+            }
+        }
+       
+        private static Object SortItem(this Object data, Type dataType)
+        {
+            if (data == null)
+            {
+                return data;
+            }
+            else if (typeof(String) != dataType && typeof(IEnumerable).IsAssignableFrom(dataType))
+            {
+                var buffer = ((IEnumerable)data).GetEnumerator().Current;
+
+                return buffer.SortItem(buffer.GetType());
+            }
+            else
+            {
+                return data;
+            }
+        }
 
         public static IEnumerable<RowType> Filter<RowType>(IEnumerable<RowType> input)
         {
@@ -58,20 +131,13 @@ namespace Dolkens.Framework.MVC
                             {
                                 if (!columnRegex)
                                 {
-                                    if (jsonMap[columnName].PropertyType == typeof(String))
-                                    {
-                                        query = query.Where(r => jsonMap[columnName].GetValue(r).ToString().ToLowerInvariant().Contains(columnSearch.ToLowerInvariant()));
-                                    }
-                                    else
-                                    {
-                                        Object searchValue = columnSearch.Parse(jsonMap[columnName].PropertyType);
-                                        query = query.Where(r => jsonMap[columnName].GetValue(r).Equals(searchValue));
-                                        // .ToString().Equals(columnSearch, StringComparison.InvariantCultureIgnoreCase));
-                                    }
+                                    query = query.Where(r => jsonMap[columnName].GetValue(r).AnyItem(jsonMap[columnName].PropertyType, columnSearch));
                                 }
                                 else
                                 {
-                                    query = query.Where(r => Regex.IsMatch(jsonMap[columnName].GetValue(r).ToString(), columnSearch, RegexOptions.IgnoreCase));
+                                    Regex match = new Regex(columnSearch, RegexOptions.IgnoreCase);
+
+                                    query = query.Where(r => jsonMap[columnName].GetValue(r).AnyItem(jsonMap[columnName].PropertyType, match));
                                 }
                             }
                         }
@@ -100,27 +166,27 @@ namespace Dolkens.Framework.MVC
                         if (propertyMap.ContainsKey(sortColumn))
                         {
                             sortDirection = request[String.Format("sSortDir_{0}", cIndex)];
-
+                            
                             if (sorts++ == 0)
                             {
                                 if (sortDirection == "desc")
                                 {
-                                    sQuery = query.OrderByDescending(r => propertyMap[sortColumn].GetValue(r));
+                                    sQuery = query.OrderByDescending(r => propertyMap[sortColumn].GetValue(r).SortItem(propertyMap[sortColumn].PropertyType));
                                 }
                                 else
                                 {
-                                    sQuery = query.OrderBy(r => propertyMap[sortColumn].GetValue(r));
+                                    sQuery = query.OrderBy(r => propertyMap[sortColumn].GetValue(r).SortItem(propertyMap[sortColumn].PropertyType));
                                 }
                             }
                             else
                             {
                                 if (sortDirection == "desc")
                                 {
-                                    sQuery = sQuery.ThenByDescending(r => propertyMap[sortColumn].GetValue(r));
+                                    sQuery = sQuery.ThenByDescending(r => propertyMap[sortColumn].GetValue(r).SortItem(propertyMap[sortColumn].PropertyType));
                                 }
                                 else
                                 {
-                                    sQuery = sQuery.ThenBy(r => propertyMap[sortColumn].GetValue(r));
+                                    sQuery = sQuery.ThenBy(r => propertyMap[sortColumn].GetValue(r).SortItem(propertyMap[sortColumn].PropertyType));
                                 }
                             }
                         }
