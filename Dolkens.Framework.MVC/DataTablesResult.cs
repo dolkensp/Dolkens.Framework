@@ -79,9 +79,16 @@ namespace Dolkens.Framework.MVC
             }
             else if (typeof(String) != dataType && typeof(IEnumerable).IsAssignableFrom(dataType))
             {
-                var buffer = ((IEnumerable)data).GetEnumerator().Current;
+                var enumerator = ((IEnumerable)data).GetEnumerator();
 
-                return buffer.SortItem(buffer.GetType());
+                if (enumerator.MoveNext())
+                {
+                    return enumerator.Current.SortItem(enumerator.Current.GetType());
+                }
+                else
+                {
+                    return null;
+                }
             }
             else
             {
