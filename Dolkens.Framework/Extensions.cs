@@ -358,6 +358,108 @@ namespace Dolkens.Framework.Extensions
 
         #region Type Extensions
 
+        private static BindingFlags targetFlags = BindingFlags.DeclaredOnly | BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static;
+
+        /// <summary>
+        /// Get a list of all non-system dependencies for a given type.
+        /// </summary>
+        /// <param name="type">The type to interrogate</param>
+        /// <returns>An enumerable of all the dependencies referenced by the specified type.</returns>
+        public static IEnumerable<Type> GetDependencies(this Type type)
+        {
+            return DDRIT.GetDependencies(type, new HashSet<Type> { });
+        }
+
+        private static IEnumerable<Type> GetDependencies(Type type, HashSet<Type> dependencies)
+        {
+            if (type.Namespace.StartsWith("System.") || type.Namespace == "System" || dependencies.Contains(type) || type.IsGenericParameter)
+                yield break;
+
+            dependencies.Add(type);
+
+            if (type.IsGenericType && !type.IsGenericTypeDefinition)
+            {
+                foreach (var t in DDRIT.GetDependencies(type.GetGenericTypeDefinition(), dependencies))
+                {
+                    yield return t;
+                }
+            }
+            else
+            {
+                yield return type;
+            }
+
+            foreach (var constructor in type.GetConstructors())
+            {
+                foreach (var parameter in constructor.GetParameters())
+                {
+                    foreach (var t in DDRIT.GetDependencies(parameter.ParameterType, dependencies))
+                    {
+                        yield return t;
+                    }
+                }
+            }
+
+            foreach (var method in type.GetMethods(targetFlags))
+            {
+                if (!method.IsSpecialName)
+                {
+                    foreach (var t in DDRIT.GetDependencies(method.ReturnType, dependencies))
+                    {
+                        yield return t;
+                    }
+                }
+
+                foreach (var parameter in method.GetParameters())
+                {
+                    foreach (var t in DDRIT.GetDependencies(parameter.ParameterType, dependencies))
+                    {
+                        yield return t;
+                    }
+                }
+            }
+
+            foreach (var field in type.GetFields(targetFlags))
+            {
+                foreach (var t in DDRIT.GetDependencies(field.FieldType, dependencies))
+                {
+                    yield return t;
+                }
+            }
+
+            foreach (var property in type.GetProperties(targetFlags))
+            {
+                foreach (var t in DDRIT.GetDependencies(property.PropertyType, dependencies))
+                {
+                    yield return t;
+                }
+            }
+
+            foreach (var @interface in type.GetInterfaces())
+            {
+                foreach (var t in DDRIT.GetDependencies(@interface, dependencies))
+                {
+                    yield return t;
+                }
+            }
+
+            foreach (var argument in type.GetGenericArguments())
+            {
+                foreach (var t in DDRIT.GetDependencies(argument, dependencies))
+                {
+                    yield return t;
+                }
+            }
+
+            if (type.BaseType != null)
+            {
+                foreach (var t in DDRIT.GetDependencies(type.BaseType, dependencies))
+                {
+                    yield return t;
+                }
+            }
+        }
+        
         private static Dictionary<Type, Attribute> _getAttributeLookup = null;
         public static TAttribute GetAttribute<TAttribute>(this Type type) where TAttribute : Attribute
         {
@@ -1542,6 +1644,13 @@ namespace System
         public static Boolean IsNullable(this Type baseType) { return DDRIT.IsNullable(baseType); }
 
         public static TAttribute GetAttribute<TAttribute>(this Type type) where TAttribute : Attribute { return DDRIT.GetAttribute<TAttribute>(type); }
+
+        /// <summary>
+        /// Get a list of all non-system dependencies for a given type.
+        /// </summary>
+        /// <param name="type">The type to interrogate</param>
+        /// <returns>An enumerable of all the dependencies referenced by the specified type.</returns>
+        public static IEnumerable<Type> GetDependencies(this Type type) { return DDRIT.GetDependencies(type); }
 
         public static String GetFriendlyTypeName(this Type type) { return DDRIT.GetFriendlyTypeName(type); }
 
