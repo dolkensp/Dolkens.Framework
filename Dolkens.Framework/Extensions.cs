@@ -372,7 +372,10 @@ namespace Dolkens.Framework.Extensions
 
         private static IEnumerable<Type> GetDependencies(Type type, HashSet<Type> dependencies)
         {
-            if (type == null || type.IsGenericParameter || type.FullName.StartsWith("System.") || dependencies.Contains(type))
+            if (type == null || type.IsGenericParameter ||
+                (type.FullName != null && type.FullName.StartsWith("System.")) ||
+                (type.Namespace != null && type.Namespace.StartsWith("System.")) ||
+                dependencies.Contains(type))
                 yield break;
 
             dependencies.Add(type);
