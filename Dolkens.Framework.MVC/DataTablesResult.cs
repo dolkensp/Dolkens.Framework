@@ -59,7 +59,7 @@ namespace Dolkens.Framework.MVC
             {
                 foreach (var item in (IEnumerable)data)
                 {
-                    if (data.AnyItem(item.GetType(), searchTerm))
+                    if (item.AnyItem(item.GetType(), searchTerm))
                         return true;
                 }
 
