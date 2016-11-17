@@ -598,6 +598,20 @@ namespace Dolkens.Framework.Extensions
             return attributes.Length > 0 ? attributes[0].Description : description;
         }
 
+        public static TEnum ToEnum<TEnum>(this Enum value, TEnum @default) where TEnum : struct
+        {
+            if (!typeof(TEnum).IsEnum) throw new InvalidOperationException("Generic type argument is not a System.Enum");
+
+            return value.ToString().ToEnum<TEnum>(@default, true);
+        }
+
+        public static TEnum? ToEnum<TEnum>(this Enum value, TEnum? @default) where TEnum : struct
+        {
+            if (!typeof(TEnum).IsEnum) throw new InvalidOperationException("Generic type argument is not a System.Enum");
+
+            return value.ToString().ToEnum<TEnum>(true) ?? @default; 
+        }
+
         public static Int16? ToInt16(this Enum input)
         {
             if (input == null)
@@ -1718,6 +1732,10 @@ namespace System
         public static Int64? ToInt64(this String input) { return DDRIT.ToInt64(input); }
 
         public static Int64 ToInt64(this String input, Int64 @default) { return DDRIT.ToInt64(input, @default); }
+
+        public static TEnum ToEnum<TEnum>(this Enum value, TEnum @default) where TEnum : struct { return DDRIT.ToEnum<TEnum>(value, @default); }
+
+        public static TEnum? ToEnum<TEnum>(this Enum value, TEnum? @default) where TEnum : struct { return DDRIT.ToEnum<TEnum>(value, @default); }
 
         public static Int16? ToInt16(this Enum input) { return DDRIT.ToInt16(input); }
 
