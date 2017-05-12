@@ -18,7 +18,7 @@ namespace Dolkens.Framework.MVC
     {
         private static Dictionary<Type, Dictionary<String, PropertyInfo>> _jsonMaps = new Dictionary<Type, Dictionary<String, PropertyInfo>> { };
 
-        private static Boolean AnyItem(this Object data, Type dataType, String searchTerm)
+        private static Boolean AnyItem(this Object data, Type dataType, String searchTerm, Boolean exactMatch = false)
         {
             if (data == null)
             {
@@ -26,14 +26,15 @@ namespace Dolkens.Framework.MVC
             }
             else if (typeof(String) == dataType)
             {
+                if (exactMatch) return ((String)data).Equals(searchTerm, StringComparison.InvariantCultureIgnoreCase);
+
                 return ((String)data).ToLowerInvariant().Contains(searchTerm.ToLowerInvariant());
             }
             else if (typeof(IEnumerable).IsAssignableFrom(dataType))
             {
                 foreach (var item in (IEnumerable)data)
                 {
-                    if (item.AnyItem(item.GetType(), searchTerm))
-                        return true;
+                    if (item.AnyItem(item.GetType(), searchTerm, exactMatch)) return true;
                 }
                 
                 return false;
@@ -96,7 +97,7 @@ namespace Dolkens.Framework.MVC
             }
         }
 
-        public static IEnumerable<RowType> Filter<RowType>(IEnumerable<RowType> input)
+        public static IEnumerable<RowType> Filter<RowType>(IEnumerable<RowType> input, Boolean exactMatch = false)
         {
             var request = HttpContext.Current.Request;
 
@@ -138,7 +139,7 @@ namespace Dolkens.Framework.MVC
                             {
                                 if (!columnRegex)
                                 {
-                                    query = query.Where(r => jsonMap[columnName].GetValue(r).AnyItem(jsonMap[columnName].PropertyType, columnSearch));
+                                    query = query.Where(r => jsonMap[columnName].GetValue(r).AnyItem(jsonMap[columnName].PropertyType, columnSearch, exactMatch));
                                 }
                                 else
                                 {
@@ -163,11 +164,12 @@ namespace Dolkens.Framework.MVC
                 IOrderedEnumerable<RowType> sQuery = null;
 
                 Int32 sorts = 0;
-                Int32 sortColumn;
                 String sortDirection;
 
                 for (Int32 cIndex = 0; cIndex < sCount; cIndex++)
                 {
+                    Int32 sortColumn;
+
                     if (Int32.TryParse(request[String.Format("iSortCol_{0}", cIndex)], out sortColumn))
                     {
                         if (propertyMap.ContainsKey(sortColumn))
@@ -212,6 +214,75 @@ namespace Dolkens.Framework.MVC
             }
 
             #endregion
+
+            return data;
+        }
+
+        public static IEnumerable<RowType> FilterColumn<RowType>(IEnumerable<RowType> input, String column, Boolean exactMatch = false)
+        {
+            var request = HttpContext.Current.Request;
+
+            RowType[] data = null;
+            var query = input.AsEnumerable();
+
+            Int32 cCount = request["iColumns"].ToInt32(0);
+            Dictionary<Int32, PropertyInfo> propertyMap = new Dictionary<Int32, PropertyInfo> { };
+
+            #region Search Support
+
+            if (cCount > 0)
+            {
+                if (!_jsonMaps.ContainsKey(typeof(RowType)))
+                {
+                    var properties = typeof(RowType).GetProperties(BindingFlags.Public | BindingFlags.Instance).Select(p => new
+                    {
+                        Property = p,
+                        JsonProperty = p.GetCustomAttribute<JsonPropertyAttribute>(true),
+                    });
+                    _jsonMaps[typeof(RowType)] = properties.ToDictionary(k => k.JsonProperty == null ? k.Property.Name : k.JsonProperty.PropertyName, v => v.Property);
+                }
+
+                var jsonMap = _jsonMaps[typeof(RowType)];
+
+                for (Int32 cIndex = 0; cIndex < cCount; cIndex++)
+                {
+                    var columnName = request[String.Format("mDataProp_{0}", cIndex)];
+                    var columnSearch = request[String.Format("sSearch_{0}", cIndex)];
+                    var columnRegex = request[String.Format("bRegex_{0}", cIndex)].ToBoolean(false);
+
+                    if (column.Equals(columnName))
+                    {
+                        if (!String.IsNullOrWhiteSpace(columnName))
+                        {
+                            if (jsonMap.ContainsKey(columnName))
+                            {
+                                propertyMap[cIndex] = jsonMap[columnName];
+
+                                if (!String.IsNullOrWhiteSpace(columnSearch))
+                                {
+                                    if (!columnRegex)
+                                    {
+                                        query = query.Where(r => jsonMap[columnName].GetValue(r).AnyItem(jsonMap[columnName].PropertyType, columnSearch, exactMatch));
+                                    }
+                                    else
+                                    {
+                                        Regex match = new Regex(columnSearch, RegexOptions.IgnoreCase);
+
+                                        query = query.Where(r => jsonMap[columnName].GetValue(r).AnyItem(jsonMap[columnName].PropertyType, match));
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            #endregion
+
+            if (data == null)
+            {
+                data = query.ToArray();
+            }
 
             return data;
         }

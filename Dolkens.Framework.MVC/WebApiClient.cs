@@ -77,6 +77,12 @@ namespace Dolkens.Framework.MVC
             }
         }
 
+        private MediaTypeFormatterEnum _mediaTypeFormatter = MediaTypeFormatterEnum.Json;
+        public virtual MediaTypeFormatterEnum MediaTypeFormatter
+        { 
+            get { return this._mediaTypeFormatter; }
+        }
+
         // public HttpRequestHeaders DefaultRequestHeaders { get; }
         // public long MaxResponseContentBufferSize { get; set; }
         // public TimeSpan Timeout { get; set; }
@@ -85,9 +91,9 @@ namespace Dolkens.Framework.MVC
 
         #region CRUD Methods
 
-        public virtual TResponse Create<TResponse>(IWebApiRequest<TResponse> data = null, MediaTypeFormatterEnum mediaTypeFormatter = MediaTypeFormatterEnum.Json) { return this.Create<TResponse>(data.ResourceUrl, data, mediaTypeFormatter); }
+        public virtual TResponse Create<TResponse>(IWebApiRequest<TResponse> data = null, MediaTypeFormatterEnum? mediaTypeFormatter = null) { return this.Create<TResponse>(data.ResourceUrl, data, mediaTypeFormatter); }
 
-        public virtual TResponse Create<TResponse>(String resource, Object data = null, MediaTypeFormatterEnum mediaTypeFormatter = MediaTypeFormatterEnum.Json)
+        public virtual TResponse Create<TResponse>(String resource, Object data = null, MediaTypeFormatterEnum? mediaTypeFormatter = null)
         {
             HttpContent content = data == null ?
                 new ObjectContent(typeof(Object), data, this.GetMediaTypeFormatter(mediaTypeFormatter)) :
@@ -96,9 +102,9 @@ namespace Dolkens.Framework.MVC
             return this._client.PostAsync(resource, content).Result.Content.ReadAsAsync<TResponse>().Result;
         }
 
-        public virtual TResponse Retrieve<TResponse>(IWebApiRequest<TResponse> data = null, MediaTypeFormatterEnum mediaTypeFormatter = MediaTypeFormatterEnum.Json) { return this.Retrieve<TResponse>(data.ResourceUrl, data, mediaTypeFormatter); }
+        public virtual TResponse Retrieve<TResponse>(IWebApiRequest<TResponse> data = null, MediaTypeFormatterEnum? mediaTypeFormatter = null) { return this.Retrieve<TResponse>(data.ResourceUrl, data, mediaTypeFormatter); }
 
-        public virtual TResponse Retrieve<TResponse>(String resource, Object data = null, MediaTypeFormatterEnum mediaTypeFormatter = MediaTypeFormatterEnum.Json)
+        public virtual TResponse Retrieve<TResponse>(String resource, Object data = null, MediaTypeFormatterEnum? mediaTypeFormatter = null)
         {
             var query = WwwFormUrlEncodedMediaTypeFormatter.Serialize(data);
 
@@ -117,9 +123,9 @@ namespace Dolkens.Framework.MVC
             return this._client.GetAsync(resource).Result.Content.ReadAsAsync<TResponse>().Result;
         }
 
-        public virtual TResponse Update<TResponse>(IWebApiRequest<TResponse> data = null, MediaTypeFormatterEnum mediaTypeFormatter = MediaTypeFormatterEnum.Json) { return this.Update<TResponse>(data.ResourceUrl, data, mediaTypeFormatter); }
+        public virtual TResponse Update<TResponse>(IWebApiRequest<TResponse> data = null, MediaTypeFormatterEnum? mediaTypeFormatter = null) { return this.Update<TResponse>(data.ResourceUrl, data, mediaTypeFormatter); }
 
-        public virtual TResponse Update<TResponse>(String resource, Object data = null, MediaTypeFormatterEnum mediaTypeFormatter = MediaTypeFormatterEnum.Json)
+        public virtual TResponse Update<TResponse>(String resource, Object data = null, MediaTypeFormatterEnum? mediaTypeFormatter = null)
         {
             HttpContent content = data == null ?
                 new ObjectContent(typeof(Object), data, this.GetMediaTypeFormatter(mediaTypeFormatter)) :
@@ -128,9 +134,9 @@ namespace Dolkens.Framework.MVC
             return this._client.PutAsync(resource, content).Result.Content.ReadAsAsync<TResponse>().Result;
         }
 
-        public virtual TResponse Delete<TResponse>(IWebApiRequest<TResponse> data = null, MediaTypeFormatterEnum mediaTypeFormatter = MediaTypeFormatterEnum.Json) { return this.Delete<TResponse>(data.ResourceUrl, data, mediaTypeFormatter); }
+        public virtual TResponse Delete<TResponse>(IWebApiRequest<TResponse> data = null, MediaTypeFormatterEnum? mediaTypeFormatter = null) { return this.Delete<TResponse>(data.ResourceUrl, data, mediaTypeFormatter); }
 
-        public virtual TResponse Delete<TResponse>(String resource, Object data = null, MediaTypeFormatterEnum mediaTypeFormatter = MediaTypeFormatterEnum.Json)
+        public virtual TResponse Delete<TResponse>(String resource, Object data = null, MediaTypeFormatterEnum? mediaTypeFormatter = null)
         {
             var query = WwwFormUrlEncodedMediaTypeFormatter.Serialize(data);
 
@@ -157,12 +163,14 @@ namespace Dolkens.Framework.MVC
             this._client.Dispose();
         }
 
-        private MediaTypeFormatter GetMediaTypeFormatter(MediaTypeFormatterEnum mediaTypeFormatter)
+        private MediaTypeFormatter GetMediaTypeFormatter(MediaTypeFormatterEnum? mediaTypeFormatter = null)
         {
+            mediaTypeFormatter = mediaTypeFormatter ?? this.MediaTypeFormatter;
+            
             switch (mediaTypeFormatter)
             {
-                case MediaTypeFormatterEnum.Bson:
-                    return new BsonMediaTypeFormatter { };
+                // case MediaTypeFormatterEnum.Bson:
+                //     return new BsonMediaTypeFormatter { };
                 case MediaTypeFormatterEnum.FormUrlEncoded:
                     return new FormUrlEncodedMediaTypeFormatter { };
                 case MediaTypeFormatterEnum.Json:
