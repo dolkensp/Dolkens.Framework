@@ -1,9 +1,9 @@
-﻿#define CACHENULLS
-using Dolkens.Framework.Caching.Interfaces;
+﻿using Dolkens.Framework.Caching.Interfaces;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Configuration;
+using System.Globalization;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.Caching;
@@ -17,27 +17,23 @@ namespace Dolkens.Framework.Caching
 
     public static class CacheUtils
     {
-
-#if CACHENULLS
         public static Object NULL_OBJECT = new { IsNull = true };
-#endif
 
-        public static String CACHEKEY_SEPARATOR1 = "|";
-        public static String CACHEKEY_SEPARATOR2 = ",";
+        public static String[] CACHEKEY_SEPARATORS = new String[] { "|", ",", ";", ".", ":" };
         public static String RegionName = null;
 
         private static Type _cacheType      = Assembly.Load(ConfigurationManager.AppSettings["Dolkens.Framework.Caching.Assembly"] ?? "Dolkens.Framework.Caching.Memory").GetType(ConfigurationManager.AppSettings["Dolkens.Framework.Caching.Type"]           ?? "Dolkens.Framework.Caching.Memory.Cache");
         private static Type _dependencyType = Assembly.Load(ConfigurationManager.AppSettings["Dolkens.Framework.Caching.Assembly"] ?? "Dolkens.Framework.Caching.Memory").GetType(ConfigurationManager.AppSettings["Dolkens.Framework.Caching.DependencyType"] ?? "Dolkens.Framework.Caching.Memory.CacheDependency");
         private static Type _settingsType   = Assembly.Load(ConfigurationManager.AppSettings["Dolkens.Framework.Caching.Assembly"] ?? "Dolkens.Framework.Caching.Memory").GetType(ConfigurationManager.AppSettings["Dolkens.Framework.Caching.SettingsType"]   ?? "Dolkens.Framework.Caching.Memory.CacheSettings");
         
-        private static ObjectCache _cache;
-        public static ObjectCache Cache
+        private static ICache _cache;
+        public static ICache Cache
         {
             // HACK: This should be private and methods below should be used for cache access
             get
             {
                 if (CacheUtils._cache == null)
-                    CacheUtils._cache = Activator.CreateInstance(CacheUtils._cacheType) as ObjectCache;
+                    CacheUtils._cache = Activator.CreateInstance(CacheUtils._cacheType) as ICache;
 
                 return CacheUtils._cache;
             }
@@ -79,25 +75,35 @@ namespace Dolkens.Framework.Caching
  
         private static Hashtable _lockTable = new Hashtable();
 
+        private static void ExplodeArray(StringBuilder sb, Array @array, Int32 depth)
+        {
+            if (depth >= CACHEKEY_SEPARATORS.Length) throw new ArgumentOutOfRangeException("Argument array too deep");
+
+            foreach (var element in @array)
+            {
+                if (element is Array)
+                {
+                    ExplodeArray(sb, element as Array, depth + 1);
+                }
+                else
+                {
+                    sb.AppendFormat(CultureInfo.InvariantCulture, "{0}{1}", CacheUtils.CACHEKEY_SEPARATORS[depth], element);
+                }
+            }
+        }
+
         public static String BuildCacheKey(String method, params Object[] args)
         {
-            StringBuilder keyBuilder = new StringBuilder();
-
+            StringBuilder keyBuilder = new StringBuilder("method|");
             keyBuilder.Append(method);
 
-            for (Int32 i = 0, j = args.Length; i < j; i++)
-            {
-                if (args[i] is Array)
-                    foreach (Object arg in args[i] as Array)
-                        keyBuilder.AppendFormat("{0}{1}", CacheUtils.CACHEKEY_SEPARATOR2, arg);
-                else
-                    keyBuilder.AppendFormat("{0}{1}", CacheUtils.CACHEKEY_SEPARATOR1, args[i]);
-            }
-
-            // Prepend prefix to key
-            keyBuilder.Insert(0, "method|");
+            CacheUtils.ExplodeArray(keyBuilder, args, 0);
 
             // TODO: Hash when this key is too long
+
+#if DEBUG
+            System.Diagnostics.Debug.WriteLine(keyBuilder.ToString());
+#endif
 
             return keyBuilder.ToString();
         }
@@ -132,10 +138,8 @@ namespace Dolkens.Framework.Caching
             // Load data from cache
             Object buffer = CacheUtils.Cache.Get(cacheKey);
 
-#if CACHENULLS
             if (buffer == CacheUtils.NULL_OBJECT)
                 return default(TResult);
-#endif
 
             if (buffer is TResult)
                 return (TResult)buffer;
@@ -209,13 +213,6 @@ namespace Dolkens.Framework.Caching
 
                 #region Cache Storage
 
-#if !CACHENULLS
-                // Early exit for empty result
-                // TODO: Consider adding option to cache NULL data here
-                if (buffer == null)
-                    return buffer = null;
-#endif
-
                 #region Ensure we have a dependency and that we have a cachekey collection to add to
 
                 settings.Dependencies = settings.Dependencies ?? Activator.CreateInstance(CacheUtils._dependencyType) as ICacheDependency;
@@ -225,17 +222,8 @@ namespace Dolkens.Framework.Caching
 
                 settings.Dependencies.CacheKeys = settings.Dependencies.CacheKeys.Union(trackingList).Distinct().ToArray();
 
-                CacheItem cacheItem = null;
-
-#if CACHENULLS
-                if (buffer == null)
-                    cacheItem = new CacheItem(cacheKey, CacheUtils.NULL_OBJECT, "CacheUtils");
-                else
-#endif
-                    cacheItem = new CacheItem(cacheKey, buffer, "CacheUtils");
-
                 // Save Data To Cache
-                CacheUtils.Cache.Add(cacheItem, settings.GetCacheItemPolicy());
+                CacheUtils.Cache.Add(cacheKey, buffer ?? CacheUtils.NULL_OBJECT, settings);
                 
                 #endregion
 
@@ -254,7 +242,7 @@ namespace Dolkens.Framework.Caching
         {
             // TODO: Support Locking Here
 
-            var buffer = data;
+            Object buffer = data;
 
             // Default cache settings
             if (settings == null)
@@ -270,14 +258,7 @@ namespace Dolkens.Framework.Caching
             #endregion
 
             #region Cache Storage
-
-#if !CACHENULLS
-                // Early exit for empty result
-                // TODO: Consider adding option to cache NULL data here
-                if (buffer == null)
-                    return buffer = null;
-#endif
-
+            
             #region Ensure we have a dependency and that we have a cachekey collection to add to
 
             settings.Dependencies = settings.Dependencies ?? Activator.CreateInstance(CacheUtils._dependencyType) as ICacheDependency;
@@ -285,21 +266,12 @@ namespace Dolkens.Framework.Caching
 
             #endregion
 
-            CacheItem cacheItem = null;
-
-#if CACHENULLS
-            if (buffer == null)
-                cacheItem = new CacheItem(cacheKey, CacheUtils.NULL_OBJECT, "CacheUtils");
-            else
-#endif
-                cacheItem = new CacheItem(cacheKey, buffer, "CacheUtils");
-
             // Save Data To Cache
-            CacheUtils.Cache.Add(cacheItem, settings.GetCacheItemPolicy());
+            CacheUtils.Cache.Add(cacheKey, buffer ?? CacheUtils.NULL_OBJECT, settings);
 
             #endregion
 
-            return buffer;
+            return data;
         }
 
         public static void DeleteCachedData<TResult>(ICacheSettings settings, MethodDelegate<TResult> @delegate, params Object[] args)

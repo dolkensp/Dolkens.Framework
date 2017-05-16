@@ -11,9 +11,6 @@ namespace Dolkens.Framework.Caching.Interfaces
         DateTime AbsoluteExpiration { get; set; }
         TimeSpan SlidingExpiration { get; set; }
         ICacheDependency Dependencies { get; set; }
-        ASP.CacheItemPriority Priority { get; set; }
-
-        ASP.CacheItemPolicy GetCacheItemPolicy();
 
         Int32 LockTimeout { get; set; }
     }
