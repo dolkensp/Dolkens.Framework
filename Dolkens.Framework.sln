@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2013
-VisualStudioVersion = 12.0.31101.0
+# Visual Studio 14
+VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dolkens.Framework", "Dolkens.Framework\Dolkens.Framework.csproj", "{CCB2D9C2-66F4-4D7A-BBE9-A81E0A37DDE0}"
 EndProject
@@ -18,25 +18,9 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dolkens.Framework.Caching.M
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dolkens.Framework.MVC", "Dolkens.Framework.MVC\Dolkens.Framework.MVC.csproj", "{9F75F9AA-9901-4200-A166-7FE96906571F}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dolkens.Framework.UnitTests", "Dolkens.Framework.UnitTests\Dolkens.Framework.UnitTests.csproj", "{C377ACA4-7468-4484-B609-F0A596B5A0D2}"
+EndProject
 Global
-	GlobalSection(TeamFoundationVersionControl) = preSolution
-		SccNumberOfProjects = 5
-		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
-		SccTeamFoundationServer = https://ddrit.visualstudio.com/defaultcollection
-		SccLocalPath0 = .
-		SccProjectUniqueName1 = Dolkens.Framework.Caching\\Dolkens.Framework.Caching.csproj
-		SccProjectName1 = Dolkens.Framework.Caching
-		SccLocalPath1 = Dolkens.Framework.Caching
-		SccProjectUniqueName2 = Dolkens.Framework\\Dolkens.Framework.csproj
-		SccProjectName2 = Dolkens.Framework
-		SccLocalPath2 = Dolkens.Framework
-		SccProjectUniqueName3 = Dolkens.Framework.Caching.Memory\\Dolkens.Framework.Caching.Memory.csproj
-		SccProjectName3 = Dolkens.Framework.Caching.Memory
-		SccLocalPath3 = Dolkens.Framework.Caching.Memory
-		SccProjectUniqueName4 = Dolkens.Framework.MVC\\Dolkens.Framework.MVC.csproj
-		SccProjectName4 = Dolkens.Framework.MVC
-		SccLocalPath4 = Dolkens.Framework.MVC
-	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
@@ -58,6 +42,10 @@ Global
 		{9F75F9AA-9901-4200-A166-7FE96906571F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9F75F9AA-9901-4200-A166-7FE96906571F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9F75F9AA-9901-4200-A166-7FE96906571F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C377ACA4-7468-4484-B609-F0A596B5A0D2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C377ACA4-7468-4484-B609-F0A596B5A0D2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C377ACA4-7468-4484-B609-F0A596B5A0D2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C377ACA4-7468-4484-B609-F0A596B5A0D2}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

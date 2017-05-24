@@ -1,0 +1,2 @@
+Dolkens.Framework	../Dolkens.Framework/Dolkens.Framework.csproj	../packages/Dolkens.Framework.1.0.6066.21523/lib/net45/Dolkens.Framework.dll
+Dolkens.Framework.Caching	../Dolkens.Framework.Caching/Dolkens.Framework.Caching.csproj	../packages/Dolkens.Framework.Caching.0.1.6066.21660/lib/net45/Dolkens.Framework.Caching.dll
