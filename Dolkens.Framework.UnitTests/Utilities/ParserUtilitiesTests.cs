@@ -7,6 +7,7 @@ namespace Dolkens.Framework.UnitTests.Utilities
     public class ParserUtilitiesTests
     {
         [TestMethod]
+        [TestCategory(nameof(Dolkens.Framework.Utilities.ParserUtilities))]
         public void Parse()
         {
             // Test String
@@ -19,6 +20,7 @@ namespace Dolkens.Framework.UnitTests.Utilities
         }
 
         [TestMethod]
+        [TestCategory(nameof(Dolkens.Framework.Utilities.ParserUtilities))]
         public void To()
         {
             // Test Cast version of Parse
@@ -26,6 +28,7 @@ namespace Dolkens.Framework.UnitTests.Utilities
         }
 
         [TestMethod]
+        [TestCategory(nameof(Dolkens.Framework.Utilities.ParserUtilities))]
         public void ToBoolean()
         {
             // ToBoolean(Boolean @default)
@@ -39,6 +42,7 @@ namespace Dolkens.Framework.UnitTests.Utilities
         }
 
         [TestMethod]
+        [TestCategory(nameof(Dolkens.Framework.Utilities.ParserUtilities))]
         public void ToInt16()
         {
             // ToInt16
@@ -56,6 +60,7 @@ namespace Dolkens.Framework.UnitTests.Utilities
         }
 
         [TestMethod]
+        [TestCategory(nameof(Dolkens.Framework.Utilities.ParserUtilities))]
         public void ToInt32()
         {
             // ToInt32
@@ -73,6 +78,7 @@ namespace Dolkens.Framework.UnitTests.Utilities
         }
 
         [TestMethod]
+        [TestCategory(nameof(Dolkens.Framework.Utilities.ParserUtilities))]
         public void ToInt64()
         {
             // ToInt64
@@ -90,6 +96,7 @@ namespace Dolkens.Framework.UnitTests.Utilities
         }
 
         [TestMethod]
+        [TestCategory(nameof(Dolkens.Framework.Utilities.ParserUtilities))]
         public void ToSingle()
         {
             // ToSingle
@@ -105,6 +112,7 @@ namespace Dolkens.Framework.UnitTests.Utilities
         }
 
         [TestMethod]
+        [TestCategory(nameof(Dolkens.Framework.Utilities.ParserUtilities))]
         public void ToDouble()
         {
             // ToDouble
@@ -120,6 +128,7 @@ namespace Dolkens.Framework.UnitTests.Utilities
         }
 
         [TestMethod]
+        [TestCategory(nameof(Dolkens.Framework.Utilities.ParserUtilities))]
         public void ToDecimal()
         {
             // ToDecimal
@@ -135,6 +144,7 @@ namespace Dolkens.Framework.UnitTests.Utilities
         }
 
         [TestMethod]
+        [TestCategory(nameof(Dolkens.Framework.Utilities.ParserUtilities))]
         public void ToDateTime()
         {
             // ToDateTime
@@ -152,6 +162,7 @@ namespace Dolkens.Framework.UnitTests.Utilities
         }
 
         [TestMethod]
+        [TestCategory(nameof(Dolkens.Framework.Utilities.ParserUtilities))]
         public void ToDateTimeOffset()
         {
             // ToDateTimeOffset
@@ -169,6 +180,7 @@ namespace Dolkens.Framework.UnitTests.Utilities
         }
 
         [TestMethod]
+        [TestCategory(nameof(Dolkens.Framework.Utilities.ParserUtilities))]
         public void ToTimeSpan()
         {
             // ToTimeSpan

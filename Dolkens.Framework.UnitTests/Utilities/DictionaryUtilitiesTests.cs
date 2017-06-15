@@ -7,6 +7,7 @@ namespace Dolkens.Framework.UnitTests.Utilities
     public class DictionaryUtilitiesTests
     {
         [TestMethod]
+        [TestCategory(nameof(Dolkens.Framework.Utilities.DictionaryUtilities))]
         public void GetValue()
         {
             // GetValue(@default)

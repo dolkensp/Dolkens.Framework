@@ -6,7 +6,7 @@ using System.Linq.Expressions;
 
 namespace Dolkens.Framework.Utilities
 {
-    internal static class EnumUtilities<TEnum> where TEnum : struct, IComparable, IFormattable, IConvertible
+    internal static class EnumUtilities<TEnum> where TEnum : struct
     {
         private static Bitwise bitwise = new Bitwise(typeof(TEnum));
         
@@ -78,7 +78,7 @@ namespace Dolkens.Framework.Utilities
         /// <typeparam name="TEnum"></typeparam>
         /// <param name="value"></param>
         /// <returns></returns>
-        public static TEnum[] ToFlagsArray<TEnum>(this Enum value) where TEnum : struct, IComparable, IFormattable, IConvertible
+        public static TEnum[] ToFlagsArray<TEnum>(this Enum value) where TEnum : struct
         {
             if (!typeof(TEnum).IsEnum) throw new ArgumentException($"`{typeof(TEnum).Name}` is not a System.Enum", "value");
 
@@ -91,7 +91,7 @@ namespace Dolkens.Framework.Utilities
         /// <typeparam name="TEnum"></typeparam>
         /// <param name="flags"></param>
         /// <returns></returns>
-        public static TEnum FromFlagsArray<TEnum>(this IEnumerable<TEnum> flags) where TEnum : struct, IComparable, IFormattable, IConvertible
+        public static TEnum FromFlagsArray<TEnum>(this IEnumerable<TEnum> flags) where TEnum : struct
         {
             if (!typeof(TEnum).IsEnum) throw new ArgumentException($"`{typeof(TEnum).Name}` is not a System.Enum", "flags");
 
@@ -136,21 +136,21 @@ namespace Dolkens.Framework.Utilities
             }
         }
 
-        public static TEnum ToEnum<TEnum>(Enum value, TEnum @default) where TEnum : struct, IComparable, IFormattable, IConvertible
+        public static TEnum ToEnum<TEnum>(Enum value, TEnum @default) where TEnum : struct
         {
             if (!typeof(TEnum).IsEnum) throw new InvalidOperationException($"`{typeof(TEnum).Name}` is not a System.Enum");
 
             return value.ToString().ToEnum<TEnum>(@default, true);
         }
 
-        public static TEnum? ToEnum<TEnum>(Enum value, TEnum? @default) where TEnum : struct, IComparable, IFormattable, IConvertible
+        public static TEnum? ToEnum<TEnum>(Enum value, TEnum? @default) where TEnum : struct
         {
             if (!typeof(TEnum).IsEnum) throw new InvalidOperationException($"`{typeof(TEnum).Name}` is not a System.Enum");
 
             return value.ToString().ToEnum<TEnum>(true) ?? @default;
         }
 
-        public static TEnum? ToEnum<TEnum>(String input, Boolean ignoreCase = true) where TEnum : struct, IComparable, IFormattable, IConvertible
+        public static TEnum? ToEnum<TEnum>(String input, Boolean ignoreCase = true) where TEnum : struct
         {
             if (!typeof(TEnum).IsEnum) throw new InvalidOperationException($"`{typeof(TEnum).Name}` is not a System.Enum");
 
@@ -162,7 +162,7 @@ namespace Dolkens.Framework.Utilities
             return null;
         }
 
-        public static TResult ToEnum<TResult>(String input, TResult @default, Boolean ignoreCase = true) where TResult : struct, IComparable, IFormattable, IConvertible
+        public static TResult ToEnum<TResult>(String input, TResult @default, Boolean ignoreCase = true) where TResult : struct
         {
             return input.ToEnum<TResult>(ignoreCase) ?? @default;
         }
@@ -175,9 +175,9 @@ namespace System
 
     public static partial class _Proxy
     {
-        public static TEnum[] ToFlagsArray<TEnum>(this Enum value) where TEnum : struct, IComparable, IFormattable, IConvertible { return DDRIT.ToFlagsArray<TEnum>(value); }
+        public static TEnum[] ToFlagsArray<TEnum>(this Enum value) where TEnum : struct { return DDRIT.ToFlagsArray<TEnum>(value); }
 
-        public static TEnum FromFlagsArray<TEnum>(this IEnumerable<TEnum> flags) where TEnum : struct, IComparable, IFormattable, IConvertible { return DDRIT.FromFlagsArray<TEnum>(flags); }
+        public static TEnum FromFlagsArray<TEnum>(this IEnumerable<TEnum> flags) where TEnum : struct { return DDRIT.FromFlagsArray<TEnum>(flags); }
 
         /// <summary>
         /// Return the friendly description of an enum value, if it has been decorated with the DescriptionAttribute,
@@ -187,12 +187,12 @@ namespace System
         /// <returns></returns>
         public static String ToDescription(this Enum value, Boolean expandFlags = true) { return DDRIT.ToDescription(value, expandFlags); }
 
-        public static TEnum ToEnum<TEnum>(this Enum value, TEnum @default) where TEnum : struct, IComparable, IFormattable, IConvertible { return DDRIT.ToEnum<TEnum>(value, @default); }
+        public static TEnum ToEnum<TEnum>(this Enum value, TEnum @default) where TEnum : struct { return DDRIT.ToEnum<TEnum>(value, @default); }
 
-        public static TEnum? ToEnum<TEnum>(this Enum value, TEnum? @default) where TEnum : struct, IComparable, IFormattable, IConvertible { return DDRIT.ToEnum<TEnum>(value, @default); }
+        public static TEnum? ToEnum<TEnum>(this Enum value, TEnum? @default) where TEnum : struct { return DDRIT.ToEnum<TEnum>(value, @default); }
 
-        public static TEnum ToEnum<TEnum>(this String input, TEnum @default, Boolean ignoreCase = true) where TEnum : struct, IComparable, IFormattable, IConvertible { return DDRIT.ToEnum<TEnum>(input, @default, ignoreCase); }
+        public static TEnum ToEnum<TEnum>(this String input, TEnum @default, Boolean ignoreCase = true) where TEnum : struct { return DDRIT.ToEnum<TEnum>(input, @default, ignoreCase); }
 
-        public static TEnum? ToEnum<TEnum>(this String input, Boolean ignoreCase = true) where TEnum : struct, IComparable, IFormattable, IConvertible { return DDRIT.ToEnum<TEnum>(input, ignoreCase); }
+        public static TEnum? ToEnum<TEnum>(this String input, Boolean ignoreCase = true) where TEnum : struct { return DDRIT.ToEnum<TEnum>(input, ignoreCase); }
     }
 }

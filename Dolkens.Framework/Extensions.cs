@@ -448,92 +448,16 @@ namespace Dolkens.Framework.Utilities
         }
 
         #endregion
-
-        #region File.IO Extensions
-
-        public static String FilePathToUri(this String path)
-        {
-            return path.Replace("\\", "/").Replace("./", "");
-        }
-
-        public static String GetRelativePath(this DirectoryInfo sourcePath, DirectoryInfo destinationPath)
-        {
-            StringBuilder path = new StringBuilder(260);
-
-            if (PathRelativePathTo(
-                path,
-                sourcePath.FullName,
-                FILE_ATTRIBUTE_DIRECTORY,
-                destinationPath.FullName,
-                FILE_ATTRIBUTE_DIRECTORY) == 0)
-                throw new ArgumentException("Paths must have a common prefix");
-
-            return path.ToString();
-        }
-
-        public static String GetRelativePath(this DirectoryInfo sourcePath, FileInfo destinationPath)
-        {
-            StringBuilder path = new StringBuilder(260);
-
-            if (PathRelativePathTo(
-                path,
-                sourcePath.FullName,
-                FILE_ATTRIBUTE_DIRECTORY,
-                destinationPath.FullName,
-                FILE_ATTRIBUTE_NORMAL) == 0)
-                throw new ArgumentException("Paths must have a common prefix");
-
-            return path.ToString();
-        }
-
-        public static String GetRelativePath(this FileInfo sourcePath, DirectoryInfo destinationPath)
-        {
-            StringBuilder path = new StringBuilder(260);
-
-            if (PathRelativePathTo(
-                path,
-                sourcePath.FullName,
-                FILE_ATTRIBUTE_NORMAL,
-                destinationPath.FullName,
-                FILE_ATTRIBUTE_DIRECTORY) == 0)
-                throw new ArgumentException("Paths must have a common prefix");
-
-            return path.ToString();
-        }
-
-        public static String GetRelativePath(this FileInfo sourcePath, FileInfo destinationPath)
-        {
-            StringBuilder path = new StringBuilder(260);
-
-            if (PathRelativePathTo(
-                path,
-                sourcePath.FullName,
-                FILE_ATTRIBUTE_NORMAL,
-                destinationPath.FullName,
-                FILE_ATTRIBUTE_NORMAL) == 0)
-                throw new ArgumentException("Paths must have a common prefix");
-
-            return path.ToString();
-        }
-
-        private const int FILE_ATTRIBUTE_DIRECTORY = 0x10;
-        private const int FILE_ATTRIBUTE_NORMAL = 0x80;
-
-        [DllImport("shlwapi.dll", SetLastError = true)]
-        private static extern int PathRelativePathTo(StringBuilder pszPath,
-            string pszFrom, int dwAttrFrom, string pszTo, int dwAttrTo);
-
-        #endregion
         
         #region Stream Extensions
 
-        public static Byte[] ReadAllBytes(this Stream stream)
+        public static Byte[] ReadAllBytes(this Stream stream, Int32 bufferSize = 81920)
         {
-            using (MemoryStream ms = new MemoryStream())
+            using (var ms = new MemoryStream { })
             {
-                Int64 oldPosition = stream.Position;
+                var oldPosition = stream.Position;
                 stream.Position = 0;
-                stream.CopyTo(ms);
+                stream.CopyTo(ms, bufferSize);
                 stream.Position = oldPosition;
                 return ms.ToArray();
             }
@@ -550,7 +474,7 @@ namespace Dolkens.Framework.Utilities
         /// <returns>Returns a string of the ordinal</returns>
         public static String ToOrdinal(this Int32 input)
         {
-            return input + ToOrdinalSuffix(input);
+            return $"{input}{input.ToOrdinalSuffix()}";
         }
 
         /// <summary>
@@ -561,13 +485,13 @@ namespace Dolkens.Framework.Utilities
         /// <returns>Returns a string of the ordinal suffix</returns>
         public static String ToOrdinalSuffix(this Int32 input)
         {
-            //TODO: this only handles English ordinals - in future we may wish to consider the culture
+            // TODO: this only handles English ordinals - in future we may wish to consider the culture
 
-            //note, we are allowing zeroth - http://en.wikipedia.org/wiki/Zeroth
+            // note, we are allowing zeroth - http://en.wikipedia.org/wiki/Zeroth
             if (input < 0)
                 throw new ArgumentOutOfRangeException("input", "Ordinal numbers cannot be negative");
 
-            //first check special case, if the result ends in 11, 12, 13, should be th
+            // first check special case, if the result ends in 11, 12, 13, should be th
             switch (input % 100)
             {
                 case 11:
@@ -576,17 +500,17 @@ namespace Dolkens.Framework.Utilities
                     return "th";
             }
 
-            //else we just check the last digit
+            // else we just check the last digit
             switch (input % 10)
             {
                 case 1:
-                    return ("st");
+                    return "st";
                 case 2:
-                    return ("nd");
+                    return "nd";
                 case 3:
-                    return ("rd");
+                    return "rd";
                 default:
-                    return ("th");
+                    return "th";
             }
         }
 
@@ -804,9 +728,7 @@ namespace System
         public static String GetFriendlyTypeName(this Type type) { return DDRIT.GetFriendlyTypeName(type); }
 
         public static String GetPropertyValue(this Object obj, PropertyInfo property) { return DDRIT.GetPropertyValue(obj, property); }
-
-        public static String FilePathToUri(this String path) { return DDRIT.FilePathToUri(path); }
-
+        
         public static Byte[] ReadAllBytes(this Stream stream) { return DDRIT.ReadAllBytes(stream); }
 
         /// <summary>
@@ -824,20 +746,6 @@ namespace System
         /// <returns>Returns a string of the ordinal suffix</returns>
         public static String ToOrdinalSuffix(this Int32 input) { return DDRIT.ToOrdinalSuffix(input); }
 
-    }
-}
-
-namespace System.IO
-{
-    public static class _Proxy
-    {
-        public static String GetRelativePath(this DirectoryInfo sourcePath, DirectoryInfo destinationPath) { return DDRIT.GetRelativePath(sourcePath, destinationPath); }
-
-        public static String GetRelativePath(this DirectoryInfo sourcePath, FileInfo destinationPath) { return DDRIT.GetRelativePath(sourcePath, destinationPath); }
-
-        public static String GetRelativePath(this FileInfo sourcePath, DirectoryInfo destinationPath) { return DDRIT.GetRelativePath(sourcePath, destinationPath); }
-
-        public static String GetRelativePath(this FileInfo sourcePath, FileInfo destinationPath) { return DDRIT.GetRelativePath(sourcePath, destinationPath); }
     }
 }
 

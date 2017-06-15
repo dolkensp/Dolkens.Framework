@@ -67,6 +67,7 @@
     <Compile Include="Utilities\EnumerationUtilities.cs" />
     <Compile Include="Utilities\EnumUtilities.cs" />
     <Compile Include="Extensions.cs" />
+    <Compile Include="Utilities\FileUtilities.cs" />
     <Compile Include="Utilities\JsonUtilities.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Utilities\ParserUtilities.cs" />

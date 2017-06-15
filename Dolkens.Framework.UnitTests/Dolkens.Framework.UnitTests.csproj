@@ -55,6 +55,7 @@
     <Compile Include="Utilities\DateTimeUtilitiesTests.cs" />
     <Compile Include="Utilities\DictionaryUtilitiesTests.cs" />
     <Compile Include="Utilities\EnumerationUtilitiesTests.cs" />
+    <Compile Include="Utilities\FileUtilitiesTests.cs" />
     <Compile Include="Utilities\EnumUtilitiesTests.cs" />
     <Compile Include="Utilities\JsonUtilitiesTests.cs" />
     <Compile Include="Utilities\ParserUtilitiesTests.cs" />

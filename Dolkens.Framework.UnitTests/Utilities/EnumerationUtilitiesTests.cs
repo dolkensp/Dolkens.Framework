@@ -7,6 +7,7 @@ namespace Dolkens.Framework.UnitTests.Utilities
     public class EnumerationUtilitiesTests
     {
         [TestMethod]
+        [TestCategory(nameof(Dolkens.Framework.Utilities.EnumerationUtilities))]
         public void FirstOrDefault()
         {
             throw new NotImplementedException();
