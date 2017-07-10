@@ -67,6 +67,10 @@ namespace Dolkens.Framework.UnitTests.Utilities
 
             var otherFlagsDescription = (TestFlags.FlagsNoDescriptionWithValue | TestFlags.OtherValue).ToDescription();
             Assert.AreEqual("OtherValue, FlagsNoDescriptionWithValue", otherFlagsDescription);
+
+            TestEnum badTest = (TestEnum)10;
+            var badTestDescription = badTest.ToDescription();
+            Assert.AreEqual("10", badTestDescription);
         }
 
         [TestMethod]

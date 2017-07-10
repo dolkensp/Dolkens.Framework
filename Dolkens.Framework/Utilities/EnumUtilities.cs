@@ -118,10 +118,10 @@ namespace Dolkens.Framework.Utilities
                     var fieldName = e.ToString();
 
                     DescriptionAttribute[] attributes = (DescriptionAttribute[])enumType
-                        .GetField(fieldName)
-                        .GetCustomAttributes(typeof(DescriptionAttribute), false);
+                        ?.GetField(fieldName)
+                        ?.GetCustomAttributes(typeof(DescriptionAttribute), false);
 
-                    return attributes.Length > 0 ? attributes[0].Description : fieldName;
+                    return attributes?.Length > 0 ? attributes[0].Description : fieldName;
                 }));
             }
             else
@@ -129,10 +129,10 @@ namespace Dolkens.Framework.Utilities
                 var fieldName = value.ToString();
 
                 DescriptionAttribute[] attributes = (DescriptionAttribute[])enumType
-                    .GetField(fieldName)
-                    .GetCustomAttributes(typeof(DescriptionAttribute), false);
+                    ?.GetField(fieldName)
+                    ?.GetCustomAttributes(typeof(DescriptionAttribute), false);
 
-                return attributes.Length > 0 ? attributes[0].Description : fieldName;
+                return attributes?.Length > 0 ? attributes[0].Description : fieldName;
             }
         }
 
