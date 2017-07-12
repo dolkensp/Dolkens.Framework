@@ -20,6 +20,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dolkens.Framework.MVC", "Do
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dolkens.Framework.UnitTests", "Dolkens.Framework.UnitTests\Dolkens.Framework.UnitTests.csproj", "{C377ACA4-7468-4484-B609-F0A596B5A0D2}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Fluent.Transfer", "Fluent.FileTransfer\Fluent.Transfer.csproj", "{3906CF7B-2D02-4AA7-A682-7E3316267B1B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sandbox", "Sandbox\Sandbox.csproj", "{92C64F97-616B-4106-B290-479A57FC59D7}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -46,6 +50,14 @@ Global
 		{C377ACA4-7468-4484-B609-F0A596B5A0D2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C377ACA4-7468-4484-B609-F0A596B5A0D2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C377ACA4-7468-4484-B609-F0A596B5A0D2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3906CF7B-2D02-4AA7-A682-7E3316267B1B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3906CF7B-2D02-4AA7-A682-7E3316267B1B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3906CF7B-2D02-4AA7-A682-7E3316267B1B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3906CF7B-2D02-4AA7-A682-7E3316267B1B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{92C64F97-616B-4106-B290-479A57FC59D7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{92C64F97-616B-4106-B290-479A57FC59D7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{92C64F97-616B-4106-B290-479A57FC59D7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{92C64F97-616B-4106-B290-479A57FC59D7}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
