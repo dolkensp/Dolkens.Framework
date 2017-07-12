@@ -13,6 +13,7 @@ namespace Fluent
     {
         ITransfer To(String destination);
         ITransfer Via(String tempFile);
+        ITransfer WithChunks(Int32? chunks = null);
         ITransfer WithCancellationToken(CancellationToken token);
 
         ITransfer Start(Boolean allowResume = true);
@@ -26,6 +27,7 @@ namespace Fluent
     {
         internal String _uriSource;
         internal String _eTag;
+
 
         internal UriTransfer() { }
 
@@ -85,17 +87,64 @@ namespace Fluent
 
                 #endregion
 
-                var tasks = new List<Task> { };
-
-                for (var i = 0; i < this._chunks; i++)
+                if (this._canChunk)
                 {
-                    tasks.Add(() );
-                }
+                    var tasks = new List<Task> { };
 
-                await Task.WhenAll(tasks, can);
+                    for (var i = 0; i < this._chunks; i++)
+                    {
+                        // tasks.Add(());
+                    }
+
+                    // await Task.WhenAll(tasks, can);
+                }
+                else
+                {
+                    using (var outStream = File.Open(this._tempFile, FileMode.OpenOrCreate, FileAccess.ReadWrite))
+                    {
+                        var bufferSize = (Int32)(100 * MB);
+                        var request = HttpWebRequest.CreateHttp(sourceUri);
+                        request.Method = "GET";
+                        request.UserAgent = this._userAgent;
+
+                        if (this._length != -1 && this._chunkSize != -1)
+                        {
+                            if (outFile.Length >= chunkSize) return tempFile; // Chunk is already complete
+                            if (offset + outFile.Length >= contentLength) return tempFile; // Final chunk is already complete
+
+                            request.AddRange(offset + outStream.Length, offset + chunkSize);
+                        }
+
+                        outStream.Position = outStream.Length;
+
+                        using (var response = await request.GetResponseAsync() as HttpWebResponse)
+                        {
+                            await response.GetResponseStream().CopyToAsync(outStream, bufferSize, this._tokenSource.Token);
+                        }
+                    }
+                }
             }
 
             throw new InvalidDataException("Supplied scheme unsupported");
+        }
+
+        internal async Task GrabChunk(Int64 offset, Int64 length)
+        {
+            var request = HttpWebRequest.CreateHttp(sourceUri);
+            request.Method = "GET";
+            request.UserAgent = this._userAgent;
+
+            using (var response = await request.GetResponseAsync() as HttpWebResponse)
+            {
+                if (response.Headers[HttpResponseHeader.AcceptRanges] != "bytes")
+                {
+                    this._canChunk = false;
+                    this._chunks = 1;
+                }
+
+                this._eTag = response.Headers[HttpResponseHeader.ETag];
+                this._length = response.ContentLength;
+            }
         }
 
         internal override async Task<Int32> ReadAsync(Byte[] buffer, Int32 offset, Int32 count)
@@ -219,20 +268,16 @@ namespace Fluent
             return this;
         }
 
-        public ITransfer WithChunks(Int32 chunks)
+        public ITransfer WithChunks(Int32? chunks = null)
         {
-            this._chunks = chunks;
+            if (!chunks.HasValue) chunks = ServicePointManager.DefaultConnectionLimit;
+
+            this._canChunk = chunks > 1;
+            this._chunks = chunks.Value;
             
             return this;
         }
-
-        public ITransfer WithAutoChunks()
-        {
-            this._chunks = -1;
-
-            return this;
-        }
-
+        
         public ITransfer Start(Boolean allowResume = true)
         {
             return this.StartAsync(allowResume).Result;
