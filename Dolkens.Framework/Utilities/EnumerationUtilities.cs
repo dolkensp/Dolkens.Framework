@@ -8,12 +8,12 @@ namespace Dolkens.Framework.Utilities
 {
     public static class EnumerationUtilities
     {
-        public static TSource FirstOrDefault<TSource>(this IEnumerable<TSource> source, TSource @default)
+        public static TSource FirstOrDefault<TSource>(IEnumerable<TSource> source, TSource @default)
         {
             return source.Count() > 0 ? source.First() : @default;
         }
 
-        public static TSource FirstOrDefault<TSource>(this IEnumerable<TSource> source, Func<TSource, Boolean> predicate, TSource @default)
+        public static TSource FirstOrDefault<TSource>(IEnumerable<TSource> source, Func<TSource, Boolean> predicate, TSource @default)
         {
             source = source.Where(predicate);
             return source.Count() > 0 ? source.First() : @default;

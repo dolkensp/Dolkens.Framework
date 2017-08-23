@@ -8,7 +8,7 @@ namespace Dolkens.Framework.Utilities
 {
     public static class DictionaryUtilities
     {
-        public static TValue GetValue<TKey, TValue>(this Dictionary<TKey, TValue> input, TKey key, TValue @default)
+        public static TValue GetValue<TKey, TValue>(Dictionary<TKey, TValue> input, TKey key, TValue @default)
         {
             TValue result;
 

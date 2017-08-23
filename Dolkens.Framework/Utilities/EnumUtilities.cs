@@ -22,9 +22,10 @@ namespace Dolkens.Framework.Utilities
         
         public static IEnumerable<TEnum> ToFlags(Enum value)
         {
-            Object match = 0;
+            Object match = default(TEnum);
+            Object zero  = default(TEnum);
 
-            if (bitwise.EQUALS(value, 0))
+            if (bitwise.EQUALS(value, zero))
             {
                 yield return (TEnum)(Object)value;
             }
@@ -33,7 +34,7 @@ namespace Dolkens.Framework.Utilities
                 foreach (var flag in Enum.GetValues(typeof(TEnum)).Cast<TEnum>().OrderByDescending(e => e))
                 {
                     if (EnumUtilities<TEnum>.HasFlag(value, flag) && // If the flag is a match
-                       !bitwise.EQUALS(flag, 0))                     // and the flag isn't equal to 0 (special case)
+                       !bitwise.EQUALS(flag, zero))                  // and the flag isn't equal to 0 (special case)
                     {
                         match = bitwise.OR(match, flag);
 
@@ -50,11 +51,12 @@ namespace Dolkens.Framework.Utilities
         {
             var enumType = value.GetType();
             var underlyingType = Enum.GetUnderlyingType(enumType);
-            Object match = 0;
+            Object match = Activator.CreateInstance(underlyingType);
+            Object zero = Activator.CreateInstance(underlyingType);
 
             var bitwise = new Bitwise(enumType);
             
-            if (bitwise.EQUALS(value, 0))
+            if (bitwise.EQUALS(value, zero))
             {
                 yield return value;
             }
@@ -63,7 +65,7 @@ namespace Dolkens.Framework.Utilities
                 foreach (var flag in Enum.GetValues(enumType).Cast<Enum>().OrderByDescending(e => e))
                 {
                     if (bitwise.EQUALS(bitwise.AND(value, flag), flag) && // If the flag is a match
-                       !bitwise.EQUALS(flag, 0))                          // and the flag isn't equal to 0 (special case)
+                       !bitwise.EQUALS(flag, zero))                       // and the flag isn't equal to 0 (special case)
                     {
                         yield return flag;
                         match = bitwise.OR(match, flag);
@@ -78,7 +80,7 @@ namespace Dolkens.Framework.Utilities
         /// <typeparam name="TEnum"></typeparam>
         /// <param name="value"></param>
         /// <returns></returns>
-        public static TEnum[] ToFlagsArray<TEnum>(this Enum value) where TEnum : struct
+        public static TEnum[] ToFlagsArray<TEnum>(Enum value) where TEnum : struct
         {
             if (!typeof(TEnum).IsEnum) throw new ArgumentException($"`{typeof(TEnum).Name}` is not a System.Enum", "value");
 
@@ -91,7 +93,7 @@ namespace Dolkens.Framework.Utilities
         /// <typeparam name="TEnum"></typeparam>
         /// <param name="flags"></param>
         /// <returns></returns>
-        public static TEnum FromFlagsArray<TEnum>(this IEnumerable<TEnum> flags) where TEnum : struct
+        public static TEnum FromFlagsArray<TEnum>(IEnumerable<TEnum> flags) where TEnum : struct
         {
             if (!typeof(TEnum).IsEnum) throw new ArgumentException($"`{typeof(TEnum).Name}` is not a System.Enum", "flags");
 

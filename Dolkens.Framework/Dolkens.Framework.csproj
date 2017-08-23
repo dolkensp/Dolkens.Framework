@@ -60,6 +60,9 @@
     <Compile Include="BenchmarkSection.cs" />
     <Compile Include="Bitwise.cs" />
     <Compile Include="Comparers\OrdinalStringComparer.cs" />
+    <Compile Include="Converters\EpochDateTimeconverter.cs" />
+    <Compile Include="Converters\UnixDateTimeConverter.cs" />
+    <Compile Include="Converters\StringFormatConverter.cs" />
     <Compile Include="Utilities\BinaryUtilities.cs" />
     <Compile Include="Utilities\CryptoUtilities.cs" />
     <Compile Include="Utilities\DateTimeUtilities.cs" />
@@ -72,6 +75,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Utilities\ParserUtilities.cs" />
     <Compile Include="Utilities\StringUtilities.cs" />
+    <Compile Include="Utilities\TypeUtilities.cs" />
     <Compile Include="Utils.cs" />
   </ItemGroup>
   <ItemGroup>

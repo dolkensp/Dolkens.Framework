@@ -15,7 +15,7 @@ namespace Dolkens.Framework.Utilities
         /// </summary>
         /// <param name="bytes">Array of bytes to convert to hex string</param>
         /// <returns>A hex string representation of the input bytes</returns>
-        public static String ToHex(this Byte[] bytes)
+        public static String ToHex(Byte[] bytes)
         {
             Char[] buffer = new Char[bytes.Length * 2];
             Int32 b;
@@ -35,7 +35,7 @@ namespace Dolkens.Framework.Utilities
         /// </summary>
         /// <param name="input">The string to hash</param>
         /// <returns>An MD5 hash of the given string</returns>
-        public static String ToMD5(this String input)
+        public static String ToMD5(String input)
         {
             using (var md5 = MD5.Create())
             {
@@ -51,7 +51,7 @@ namespace Dolkens.Framework.Utilities
         /// </summary>
         /// <param name="input">The string to hash</param>
         /// <returns>An SHA1 hash of the given string</returns>
-        public static String ToSHA1(this String input)
+        public static String ToSHA1(String input)
         {
             using (var sha = SHA1.Create())
             {
@@ -67,7 +67,7 @@ namespace Dolkens.Framework.Utilities
         /// </summary>
         /// <param name="input">The string to hash</param>
         /// <returns>An SHA256 hash of the given string</returns>
-        public static String ToSHA256(this String input)
+        public static String ToSHA256(String input)
         {
             using (var sha = SHA256.Create())
             {
@@ -83,7 +83,7 @@ namespace Dolkens.Framework.Utilities
         /// </summary>
         /// <param name="input">The string to hash</param>
         /// <returns>An SHA384 hash of the given string</returns>
-        public static String ToSHA384(this String input)
+        public static String ToSHA384(String input)
         {
             using (var sha = SHA384.Create())
             {
@@ -99,7 +99,7 @@ namespace Dolkens.Framework.Utilities
         /// </summary>
         /// <param name="input">The string to hash</param>
         /// <returns>An SHA512 hash of the given string</returns>
-        public static String ToSHA512(this String input)
+        public static String ToSHA512(String input)
         {
             using (var sha = SHA512.Create())
             {

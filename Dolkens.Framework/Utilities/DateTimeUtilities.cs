@@ -4,6 +4,8 @@ namespace Dolkens.Framework.Utilities
 {
     public static class DateTimeUtilities
     {
+        public static DateTime EPOCH = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+
         public static DateTime StartOfWeek(DateTime date, DayOfWeek startOfWeek = DayOfWeek.Sunday) { return date.Date.AddDays(-(Int32)date.AddDays(-(Int32)startOfWeek).DayOfWeek); }
 
         public static DateTime EndOfWeek(DateTime date, DayOfWeek startOfWeek = DayOfWeek.Sunday) { return date.StartOfWeek(startOfWeek).AddDays(7).AddTicks(-1); }
