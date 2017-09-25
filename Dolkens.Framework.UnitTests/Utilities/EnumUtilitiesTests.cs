@@ -9,7 +9,7 @@ namespace Dolkens.Framework.UnitTests.Utilities
     {
         private enum TestEnum
         {
-            TestNoDescription,
+            TestNoDescription, // = 0
             TestNoDescriptionWithValue = 4,
 
             [Enum.Description("Test Description")]
@@ -36,10 +36,47 @@ namespace Dolkens.Framework.UnitTests.Utilities
             MultiFlagsDescription = FlagsDescriptionWithValue | OtherValue,
         }
 
+        [Flags]
+        private enum TestFlagsNoZero : Int64
+        {
+            Flag1 = 1,
+            Flag2 = 2,
+            Flag4 = 4,
+        }
+
+        [Flags]
+        public enum TriggerEnum : Int64
+        {
+            Retrieve = 1,
+            Insert = 2,
+            Update = 4,
+            Delete = 8,
+
+            Touch = 16,
+
+            // Patch = 32,
+            // Options = 64,
+
+            StartSession = 128,
+            EndSession = 256,
+            CancelSession = 512,
+
+            CheckIn = 1024,
+            Completed = 2048,
+            Charge = 4096,
+
+            HardwareSync = 8192,
+            ChargingSync = 16384,
+
+            Error = Int64.MaxValue,
+        }
+
         [TestMethod]
         [TestCategory(nameof(Dolkens.Framework.Utilities.EnumUtilities))]
         public void ToDescription()
         {
+            var val1 = (Int32)TestEnum.TestNoDescription;
+
             var testNoDescription = TestEnum.TestNoDescription.ToDescription();
             Assert.AreEqual("TestNoDescription", testNoDescription, "TestEnum with no description, and no value, returned unexpected result.");
             var testNoDescriptionWithValue = TestEnum.TestNoDescriptionWithValue.ToDescription();
@@ -71,6 +108,10 @@ namespace Dolkens.Framework.UnitTests.Utilities
             TestEnum badTest = (TestEnum)10;
             var badTestDescription = badTest.ToDescription();
             Assert.AreEqual("10", badTestDescription);
+
+            TestFlags badTestFlags = (TestFlags)6;
+            var badTestFlagsDescription = badTestFlags.ToDescription();
+            Assert.AreEqual("FlagsNoDescriptionWithValue, 6", badTestFlagsDescription);
         }
 
         [TestMethod]
@@ -91,13 +132,16 @@ namespace Dolkens.Framework.UnitTests.Utilities
         [TestCategory(nameof(Dolkens.Framework.Utilities.EnumUtilities))]
         public void ToFlags()
         {
-            var singleFlag = (TestFlags.FlagsDescription).ToFlagsArray<TestFlags>();
+            // var singleFlag = (TestFlags.FlagsDescription).ToFlagsArray<TestFlags>().FromFlagsArray<TestFlags>();
+            // 
+            // var multiFlag1 = (TestFlags.MultiFlagsDescription).ToFlagsArray<TestFlags>().FromFlagsArray<TestFlags>();
+            // 
+            // var multiFlag2 = (TestFlags.MultiFlagsNoDescription).ToFlagsArray<TestFlags>().FromFlagsArray<TestFlags>();
+            // 
+            // var multiFlag3 = (TestFlags.FlagsNoDescriptionWithValue | TestFlags.MultiFlagsDescription).ToFlagsArray<TestFlags>().FromFlagsArray<TestFlags>();
 
-            var multiFlag1 = (TestFlags.MultiFlagsDescription).ToFlagsArray<TestFlags>();
-
-            var multiFlag2 = (TestFlags.MultiFlagsNoDescription).ToFlagsArray<TestFlags>();
-
-            var multiFlag3 = (TestFlags.FlagsNoDescriptionWithValue | TestFlags.MultiFlagsDescription).ToFlagsArray<TestFlags>();
+            var multiFlag4 = (TestFlagsNoZero.Flag2 | TestFlagsNoZero.Flag4).ToFlagsArray<TestFlagsNoZero>().FromFlagsArray<TestFlagsNoZero>();
+            var multiFlag5 = (TriggerEnum.Insert | TriggerEnum.Update).ToFlagsArray<TriggerEnum>().FromFlagsArray<TriggerEnum>();
         }
     }
 }

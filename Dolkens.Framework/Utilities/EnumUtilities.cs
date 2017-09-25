@@ -64,12 +64,17 @@ namespace Dolkens.Framework.Utilities
             {
                 foreach (var flag in Enum.GetValues(enumType).Cast<Enum>().OrderByDescending(e => e))
                 {
-                    if (bitwise.EQUALS(bitwise.AND(value, flag), flag) && // If the flag is a match
-                       !bitwise.EQUALS(flag, zero))                       // and the flag isn't equal to 0 (special case)
+                    if (!bitwise.EQUALS(flag, zero) &&                  // If the flag isn't equal to 0 (special case)
+                        bitwise.EQUALS(bitwise.AND(value, flag), flag)) // and the flag is a match
                     {
                         yield return flag;
                         match = bitwise.OR(match, flag);
                     }
+                }
+
+                if (!bitwise.EQUALS(match, value))
+                {
+                    yield return value;
                 }
             }
         }
