@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
+  <metadata>
+    <id>Dolkens.Framework.TaskRunners</id>
+    <version>6.11.3.1</version>
+    <title>Dependency Free Gulp/Grunt.js Support</title>
+    <authors>Peter Dolkens</authors>
+    <owners>DDRIT Sydney</owners>
+    <projectUrl>http://blog.ddrit.com/2013/11/integrating-node-js-npm-and-requirejs-into-visual-studio-msbuild/</projectUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>Dependency-free support for Gulp.js, Grunt.js, Node.js, and NPM</description>
+    <summary>This package will automatically download node.js and npm from the node.js servers.
+
+It will also add a before-build step that automatically restores node packages, and executes your gulpfile/gruntfile compile step.</summary>
+    <copyright>Copyright © DDRIT Sydney 2014</copyright>
+    <tags>node.js grunt.js gulp.js grunt gulp node npm msbuild</tags>
+  </metadata>
+</package>
