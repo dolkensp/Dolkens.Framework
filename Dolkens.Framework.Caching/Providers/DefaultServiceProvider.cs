@@ -7,12 +7,17 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Dolkens.Framework.Caching
+namespace Dolkens.Framework.Caching.Providers
 {
     internal class DefaultServiceProvider : IServiceProvider
     {
         public Object GetService(Type serviceType)
         {
+            if (serviceType == typeof(ICacheProvider))
+            {
+                return new TrackingCacheProvider { };
+            }
+
             if (serviceType == typeof(ICache))
             {
                 return Activator.CreateInstance(Assembly.Load(ConfigurationManager.AppSettings["Dolkens.Framework.Caching.Assembly"] ?? "Dolkens.Framework.Caching.Memory").GetType(ConfigurationManager.AppSettings["Dolkens.Framework.Caching.Type"] ?? "Dolkens.Framework.Caching.Memory.Cache"));

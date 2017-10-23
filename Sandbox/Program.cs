@@ -15,13 +15,13 @@ namespace Sandbox
 
             var isBigger = DateTime.Today > test;
 
-            // 
-            // Fluent.Transfer
-            //     .From("http://25.webseed.robertsspaceindustries.com/GameBuilds/sc-alpha-2.6.0/523988-c/StarCitizen/Data/Textures-part0.pak")
-            //     .To("textures-part0.pak")
-            //     .Via("temp.pak")
-            //     .WithChunks()
-            //     .Start();
+            
+            Fluent.Transfer
+                .From("http://25.webseed.robertsspaceindustries.com/GameBuilds/sc-alpha-2.6.0/523988-c/StarCitizen/Data/Textures-part0.pak")
+                .To("textures-part0.pak")
+                .Via("temp.pak")
+                .WithChunks()
+                .Start();
 
             MethodDelegate<Object> testMethod = (Object[] args2) => { return new { Foo = "bar", Hello = "world", Random = DateTime.Now.Ticks }; };
 
@@ -32,6 +32,8 @@ namespace Sandbox
             CacheUtils.DeleteCachedData(CacheUtils.DefaultSettings, testMethod, 123);
 
             var test3 = CacheUtils.GetCachedData(CacheUtils.DefaultSettings, testMethod, 123);
+
+            
         }
     }
 }

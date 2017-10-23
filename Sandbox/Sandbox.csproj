@@ -33,6 +33,18 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Dolkens.Framework, Version=1.0.6066.21523, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Dolkens.Framework.1.0.6066.21523\lib\net45\Dolkens.Framework.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Dolkens.Framework.Caching, Version=0.1.6505.30701, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Dolkens.Framework.Caching.0.1.6505.30701\lib\net45\Dolkens.Framework.Caching.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Newtonsoft.Json, Version=4.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.4.0.1\lib\40\Newtonsoft.Json.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -48,15 +60,16 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Dolkens.Framework.Caching.Memory\Dolkens.Framework.Caching.Memory.csproj">
       <Project>{30f438ff-18cd-47a0-81c0-d27ff9a2101b}</Project>
       <Name>Dolkens.Framework.Caching.Memory</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Dolkens.Framework.Caching\Dolkens.Framework.Caching.csproj">
-      <Project>{D64BF73D-2673-41A1-9A4E-A462DAE4D2D1}</Project>
-      <Name>Dolkens.Framework.Caching</Name>
+    <ProjectReference Include="..\Fluent.FileTransfer\Fluent.Transfer.csproj">
+      <Project>{3906cf7b-2d02-4aa7-a682-7e3316267b1b}</Project>
+      <Name>Fluent.Transfer</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

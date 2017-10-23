@@ -9,9 +9,12 @@ using System.Runtime.Caching;
 using System.Text;
 using System.Threading;
 
-namespace Dolkens.Framework.Caching
+namespace Dolkens.Framework.Caching.Providers
 {
-    public class CacheProvider
+    /// <summary>
+    /// A Cache Provider that automatically tracks child dependencies.
+    /// </summary>
+    public class TrackingCacheProvider : ICacheProvider
     {
 #if CACHENULLS
         public static Object NULL_OBJECT = new { IsNull = true };
@@ -24,27 +27,18 @@ namespace Dolkens.Framework.Caching
         public static String RegionName = null;
 
         private ICache _cache;
-        // public static ObjectCache Cache
-        // {
-        //     // HACK: This should be private and methods below should be used for cache access
-        //     get
-        //     {
-        //         if (CacheProvider._cache == null)
-        //             CacheProvider._cache = Activator.CreateInstance(CacheProvider._cacheType) as ObjectCache;
-        // 
-        //         return CacheProvider._cache;
-        //     }
-        // }
 
-        private IServiceProvider _serviceProvider;
-
-        private Dictionary<Object, Object> _tracker = new Dictionary<Object, Object> { { CacheProvider.CacheTrackingKey, new String[] { } } };
-
-        internal CacheProvider()
+        [Obsolete("Remove this when possible", false)]
+        public ICache Cache
         {
-            this._serviceProvider = new DefaultServiceProvider { };
+            get { return this._cache; }
+        }
 
-            this._cache = this._serviceProvider.GetService(typeof(ICache)) as ICache;
+        private Dictionary<Object, Object> _tracker = new Dictionary<Object, Object> { { TrackingCacheProvider.CacheTrackingKey, new String[] { } } };
+
+        internal TrackingCacheProvider()
+        {
+            this._cache = new DefaultServiceProvider { }.GetService(typeof(ICache)) as ICache;
 
             if (this._cache == null)
             {
@@ -54,11 +48,9 @@ namespace Dolkens.Framework.Caching
 
         private Hashtable _lockTable = new Hashtable();
 
-        public CacheProvider(IServiceProvider serviceProvider)
+        public TrackingCacheProvider(ICache cache)
         {
-            this._serviceProvider = serviceProvider;
-
-            this._cache = this._serviceProvider.GetService(typeof(ICache)) as ICache;
+            this._cache = cache;
 
             if (this._cache == null)
             {
@@ -66,32 +58,42 @@ namespace Dolkens.Framework.Caching
             }
         }
 
+        /// <summary>
+        /// Get the default cache settings for the configured caching provider
+        /// </summary>
         public ICacheSettings DefaultSettings
         {
-            get { return this._serviceProvider.GetService(typeof(ICacheSettings)) as ICacheSettings; }
+            get { return this._cache.DefaultSettings; }
         }
 
+        /// <summary>
+        /// Get the default dependency tracking for the configured caching provider
+        /// </summary>
         public ICacheDependency DefaultDependency
         {
-            get { return this._serviceProvider.GetService(typeof(ICacheDependency)) as ICacheDependency; }
+            get { return this._cache.DefaultDependency; }
         }
 
         internal IEnumerable<String> SwapTracking(IEnumerable<String> newList = null)
         {
-            IEnumerable<String> buffer = this._tracker[CacheProvider.CacheTrackingKey] as IEnumerable<String> ?? new String[] { };
+            IEnumerable<String> buffer = this._tracker[TrackingCacheProvider.CacheTrackingKey] as IEnumerable<String> ?? new String[] { };
 
-            this._tracker[CacheProvider.CacheTrackingKey] = (newList ?? new String[] { }).ToArray();
+            this._tracker[TrackingCacheProvider.CacheTrackingKey] = (newList ?? new String[] { }).ToArray();
 
             return buffer.Distinct<String>().ToArray<String>();
         }
 
+        /// <summary>
+        /// Add the given cache keys to the list of keys that are tracked for the current cached method
+        /// </summary>
+        /// <param name="cacheKeys"></param>
         public void AddTracking(params String[] cacheKeys)
         {
-            IEnumerable<String> buffer = this._tracker[CacheProvider.CacheTrackingKey] as IEnumerable<String> ?? new String[] { };
+            IEnumerable<String> buffer = this._tracker[TrackingCacheProvider.CacheTrackingKey] as IEnumerable<String> ?? new String[] { };
 
             buffer = buffer.Union(cacheKeys).ToArray();
 
-            this._tracker[CacheProvider.CacheTrackingKey] = buffer;
+            this._tracker[TrackingCacheProvider.CacheTrackingKey] = buffer;
         }
 
         public String BuildCacheKey(String method, params Object[] args)
@@ -104,9 +106,9 @@ namespace Dolkens.Framework.Caching
             {
                 if (args[i] is Array)
                     foreach (Object arg in args[i] as Array)
-                        keyBuilder.AppendFormat("{0}{1}", CacheProvider.CACHEKEY_SEPARATOR2, arg);
+                        keyBuilder.AppendFormat("{0}{1}", TrackingCacheProvider.CACHEKEY_SEPARATOR2, arg);
                 else
-                    keyBuilder.AppendFormat("{0}{1}", CacheProvider.CACHEKEY_SEPARATOR1, args[i]);
+                    keyBuilder.AppendFormat("{0}{1}", TrackingCacheProvider.CACHEKEY_SEPARATOR1, args[i]);
             }
 
             // Prepend prefix to key
@@ -117,6 +119,13 @@ namespace Dolkens.Framework.Caching
             return keyBuilder.ToString();
         }
 
+        /// <summary>
+        /// Return the cache key for a given delegate, with given arguments
+        /// </summary>
+        /// <typeparam name="TResult">The return type of the given delegate</typeparam>
+        /// <param name="delegate">The delegate to cache</param>
+        /// <param name="args">The arguments passed to the given delegate</param>
+        /// <returns>A cache key for the given delegate</returns>
         public String BuildCacheKey<TResult>(MethodDelegate<TResult> @delegate, params Object[] args)
         {
             return this.BuildCacheKey(String.Format("{0}.{1}", @delegate.Method.DeclaringType.GetFriendlyTypeName(), @delegate.Method.Name), args);
@@ -148,7 +157,7 @@ namespace Dolkens.Framework.Caching
             Object buffer = this._cache.Get(cacheKey);
 
 #if CACHENULLS
-            if (buffer == CacheProvider.NULL_OBJECT)
+            if (buffer == TrackingCacheProvider.NULL_OBJECT)
                 return default(TResult);
 #endif
 
@@ -177,7 +186,7 @@ namespace Dolkens.Framework.Caching
 
                 buffer = this._cache.Get(cacheKey);
 
-                if (buffer == CacheProvider.NULL_OBJECT)
+                if (buffer == TrackingCacheProvider.NULL_OBJECT)
                 {
                     if (inLock)
                         Monitor.Exit(this._lockTable[cacheKey]);
@@ -244,7 +253,7 @@ namespace Dolkens.Framework.Caching
 
 #if CACHENULLS
                 if (buffer == null)
-                    cacheItem = new CacheItem(cacheKey, CacheProvider.NULL_OBJECT, "CacheUtils");
+                    cacheItem = new CacheItem(cacheKey, TrackingCacheProvider.NULL_OBJECT, "CacheUtils");
                 else
 #endif
                 cacheItem = new CacheItem(cacheKey, buffer, "CacheUtils");
@@ -304,7 +313,7 @@ namespace Dolkens.Framework.Caching
 
 #if CACHENULLS
             if (buffer == null)
-                cacheItem = new CacheItem(cacheKey, CacheProvider.NULL_OBJECT, "CacheUtils");
+                cacheItem = new CacheItem(cacheKey, TrackingCacheProvider.NULL_OBJECT, "CacheUtils");
             else
 #endif
             cacheItem = new CacheItem(cacheKey, buffer, "CacheUtils");
