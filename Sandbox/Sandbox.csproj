@@ -50,9 +50,13 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Fluent.FileTransfer\Fluent.Transfer.csproj">
-      <Project>{3906cf7b-2d02-4aa7-a682-7e3316267b1b}</Project>
-      <Name>Fluent.Transfer</Name>
+    <ProjectReference Include="..\Dolkens.Framework.Caching.Memory\Dolkens.Framework.Caching.Memory.csproj">
+      <Project>{30f438ff-18cd-47a0-81c0-d27ff9a2101b}</Project>
+      <Name>Dolkens.Framework.Caching.Memory</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Dolkens.Framework.Caching\Dolkens.Framework.Caching.csproj">
+      <Project>{D64BF73D-2673-41A1-9A4E-A462DAE4D2D1}</Project>
+      <Name>Dolkens.Framework.Caching</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
