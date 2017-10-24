@@ -1,4 +1,5 @@
 ﻿using Dolkens.Framework.Caching;
+using Dolkens.Framework.Telemetry;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,29 +12,33 @@ namespace Sandbox
     {
         static void Main(string[] args)
         {
-            DateTime? test = null;
+            try
+            {
+                using (new TimedSection("Custom.Section"))
+                {
+                    String.Format("Final {0}", "section");
 
-            var isBigger = DateTime.Today > test;
+                    using (new TimedSection("Custom.Section"))
+                    {
+                        var test1 = TimedSection.Run(String.Format, "Hello {0}", "world");
 
-            
-            Fluent.Transfer
-                .From("http://25.webseed.robertsspaceindustries.com/GameBuilds/sc-alpha-2.6.0/523988-c/StarCitizen/Data/Textures-part0.pak")
-                .To("textures-part0.pak")
-                .Via("temp.pak")
-                .WithChunks()
-                .Start();
+                        TimedSection.Run(Program.Test, "Hello {0}", "world");
 
-            MethodDelegate<Object> testMethod = (Object[] args2) => { return new { Foo = "bar", Hello = "world", Random = DateTime.Now.Ticks }; };
+                        throw new NotImplementedException("Another Exception Here");
+                    }
+                }
+            }
+            catch (Exception)
+            {
+                var test2 = TimedSection.Run(String.Format, "Foo {0}", "bar");
+            }
 
-            var test1 = CacheUtils.GetCachedData(CacheUtils.DefaultSettings, testMethod, 123);
+            var test3 = TimedSection.Run(String.Format, "Abra {0}", "kadabra");
+        }
 
-            var test2 = CacheUtils.GetCachedData(CacheUtils.DefaultSettings, testMethod, 123);
-
-            CacheUtils.DeleteCachedData(CacheUtils.DefaultSettings, testMethod, 123);
-
-            var test3 = CacheUtils.GetCachedData(CacheUtils.DefaultSettings, testMethod, 123);
-
-            
+        static void Test()
+        {
+            throw new NotImplementedException("HGi");
         }
     }
 }

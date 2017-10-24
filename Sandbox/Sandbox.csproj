@@ -67,6 +67,10 @@
       <Project>{30f438ff-18cd-47a0-81c0-d27ff9a2101b}</Project>
       <Name>Dolkens.Framework.Caching.Memory</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Dolkens.Framework.Telemetry\Dolkens.Framework.Telemetry.csproj">
+      <Project>{0d271275-bd87-463d-9daf-011177c1109e}</Project>
+      <Name>Dolkens.Framework.Telemetry</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Fluent.FileTransfer\Fluent.Transfer.csproj">
       <Project>{3906cf7b-2d02-4aa7-a682-7e3316267b1b}</Project>
       <Name>Fluent.Transfer</Name>

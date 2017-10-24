@@ -2,7 +2,7 @@
 using Dolkens.Framework.Caching.Interfaces;
 using ASP = System.Runtime.Caching;
 
-namespace Dolkens.Framework.Caching.Memory
+namespace Dolkens.Framework.Caching.Stub
 {
     public class Cache : ASP.MemoryCache, ICache
     {
