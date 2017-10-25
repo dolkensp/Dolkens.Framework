@@ -12,10 +12,7 @@ namespace Dolkens.Framework.Caching.Stub
             set { }
         }
 
-        public Boolean Add(ASP.CacheItem item, ASP.CacheItemPolicy policy)
-        {
-            throw new NotImplementedException();
-        }
+        public Boolean Add(ASP.CacheItem item, ASP.CacheItemPolicy policy) { return false; }
 
         public Object Get(String key, String regionName = null)
         {
