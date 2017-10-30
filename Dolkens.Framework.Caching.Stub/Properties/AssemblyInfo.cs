@@ -6,7 +6,7 @@ using System.Runtime.InteropServices;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("Dolkens.Framework.Caching.Stub")]
-[assembly: AssemblyDescription("Provides a Stubbed caching implementation")]
+[assembly: AssemblyDescription("Provides a stubbed implementation of the ICache service for Dolkens.Framework.Caching, which never stores or retrieves anything from cache. This is useful when testing logic which would otherwise be cached. You can simply rebind the ICache dependency, and effectively disable caching for testing.")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("DDRIT Sydney")]
 [assembly: AssemblyProduct("Dolkens.Framework.Caching.Stub")]

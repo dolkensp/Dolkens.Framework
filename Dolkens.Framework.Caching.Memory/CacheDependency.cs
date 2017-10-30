@@ -2,7 +2,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace Dolkens.Framework.Caching.Stub
+namespace Dolkens.Framework.Caching.Memory
 {
     public class CacheDependency : ICacheDependency
     {

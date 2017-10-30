@@ -4,7 +4,7 @@ using System.Configuration;
 using System.Linq;
 using ASP = System.Runtime.Caching;
 
-namespace Dolkens.Framework.Caching.Stub
+namespace Dolkens.Framework.Caching.Memory
 {
     public class CacheSettings : ICacheSettings
     {
