@@ -7,81 +7,6 @@ using System.Net.Http.Formatting;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Dolkens.Framework.MVC.Async
-{
-    using MediaTypeFormatterEnum = Dolkens.Framework.MVC.WebApiClient.MediaTypeFormatterEnum;
-
-    public class WebApiClient : IDisposable
-    {
-        #region Private Properties
-
-        protected HttpClient _client;
-
-        #endregion
-
-        #region Constructor/s
-
-        public WebApiClient()
-        {
-            this._client = this._client ?? new HttpClient { };
-        }
-
-        public WebApiClient(String baseAddress)
-            : base()
-        {
-            if (!String.IsNullOrWhiteSpace(baseAddress))
-            {
-                this.BaseAddress = new Uri(baseAddress);
-            }
-        }
-
-        public WebApiClient(Uri baseAddress)
-            : base()
-        {
-            if (baseAddress != null)
-            {
-                this.BaseAddress = baseAddress;
-            }
-        }
-
-        #endregion
-
-        #region Public Properties
-
-        public Uri BaseAddress
-        {
-            get
-            {
-                this._client = this._client ?? new HttpClient { };
-                return this._client.BaseAddress;
-            }
-            set
-            {
-                this._client = this._client ?? new HttpClient { };
-                this._client.BaseAddress = value;
-            }
-        }
-
-        private MediaTypeFormatterEnum _mediaTypeFormatter = MediaTypeFormatterEnum.Json;
-        public virtual MediaTypeFormatterEnum MediaTypeFormatter
-        {
-            get { return this._mediaTypeFormatter; }
-        }
-
-        // public HttpRequestHeaders DefaultRequestHeaders { get; }
-        // public long MaxResponseContentBufferSize { get; set; }
-        // public TimeSpan Timeout { get; set; }
-
-        #endregion
-
-        public void Dispose()
-        {
-            this._client = this._client ?? new HttpClient { };
-            this._client.Dispose();
-        }
-    }
-}
-
 namespace Dolkens.Framework.MVC
 {
     using Utilities = Dolkens.Framework.MVC.WebApiClient;
@@ -122,7 +47,7 @@ namespace Dolkens.Framework.MVC
 
         #region Private Properties
 
-        private HttpClientHandler _clientHandler;
+        private HttpClientHandler _clientHandler = new HttpClientHandler { UseCookies = false };
 
         protected HttpClient _client;
 
@@ -132,7 +57,6 @@ namespace Dolkens.Framework.MVC
 
         public WebApiClient()
         {
-            this._clientHandler = new HttpClientHandler { UseCookies = false };
             this._client = this._client ?? new HttpClient(this._clientHandler) { };
         }
 
@@ -162,12 +86,12 @@ namespace Dolkens.Framework.MVC
         {
             get
             {
-                this._client = this._client ?? new HttpClient { };
+                this._client = this._client ?? new HttpClient(this._clientHandler) { };
                 return this._client.BaseAddress;
             }
             set
             {
-                this._client = this._client ?? new HttpClient { };
+                this._client = this._client ?? new HttpClient(this._clientHandler) { };
                 this._client.BaseAddress = value;
             }
         }
