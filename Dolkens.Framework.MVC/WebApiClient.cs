@@ -122,6 +122,8 @@ namespace Dolkens.Framework.MVC
 
         #region Private Properties
 
+        private HttpClientHandler _clientHandler;
+
         protected HttpClient _client;
 
         #endregion
@@ -130,7 +132,8 @@ namespace Dolkens.Framework.MVC
 
         public WebApiClient()
         {
-            this._client = this._client ?? new HttpClient { };
+            this._clientHandler = new HttpClientHandler { UseCookies = false };
+            this._client = this._client ?? new HttpClient(this._clientHandler) { };
         }
 
         public WebApiClient(String baseAddress)
@@ -331,8 +334,8 @@ namespace Dolkens.Framework.MVC
 
         public void Dispose()
         {
-            this._client = this._client ?? new HttpClient { };
-            this._client.Dispose();
+            this._client?.Dispose();
+            this._clientHandler?.Dispose();
         }
 
         internal static MediaTypeFormatter GetMediaTypeFormatter(MediaTypeFormatterEnum mediaTypeFormatter)
