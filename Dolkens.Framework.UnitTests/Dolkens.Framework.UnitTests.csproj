@@ -50,6 +50,7 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
+    <Compile Include="Utilities\CacheUtilitiesTests.cs" />
     <Compile Include="Utilities\BinaryUtilitiesTests.cs" />
     <Compile Include="Utilities\CryptoUtilitiesTests.cs" />
     <Compile Include="Utilities\DateTimeUtilitiesTests.cs" />
@@ -63,6 +64,14 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Dolkens.Framework.Caching.Memory\Dolkens.Framework.Caching.Memory.csproj">
+      <Project>{30f438ff-18cd-47a0-81c0-d27ff9a2101b}</Project>
+      <Name>Dolkens.Framework.Caching.Memory</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Dolkens.Framework.Caching\Dolkens.Framework.Caching.csproj">
+      <Project>{d64bf73d-2673-41a1-9a4e-a462dae4d2d1}</Project>
+      <Name>Dolkens.Framework.Caching</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Dolkens.Framework\Dolkens.Framework.csproj">
       <Project>{ccb2d9c2-66f4-4d7a-bbe9-a81e0a37dde0}</Project>
       <Name>Dolkens.Framework</Name>

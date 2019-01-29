@@ -11,6 +11,8 @@ namespace Dolkens.Framework.Caching.Providers
 {
     internal class DefaultServiceProvider : IServiceProvider
     {
+        private static Object _cache;
+
         public Object GetService(Type serviceType)
         {
             if (serviceType == typeof(ICacheProvider))
@@ -20,7 +22,7 @@ namespace Dolkens.Framework.Caching.Providers
 
             if (serviceType == typeof(ICache))
             {
-                return Activator.CreateInstance(Assembly.Load(ConfigurationManager.AppSettings["Dolkens.Framework.Caching.Assembly"] ?? "Dolkens.Framework.Caching.Memory").GetType(ConfigurationManager.AppSettings["Dolkens.Framework.Caching.Type"] ?? "Dolkens.Framework.Caching.Memory.Cache"));
+                return _cache = _cache ?? Activator.CreateInstance(Assembly.Load(ConfigurationManager.AppSettings["Dolkens.Framework.Caching.Assembly"] ?? "Dolkens.Framework.Caching.Memory").GetType(ConfigurationManager.AppSettings["Dolkens.Framework.Caching.Type"] ?? "Dolkens.Framework.Caching.Memory.Cache"));
             }
 
             if (serviceType == typeof(ICacheDependency))
